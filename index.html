@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --paper: #FAF7F2;
+    --ink: #1A1814;
+    --ink-light: #6B6560;
+    --ink-faint: #C8C2BA;
+    --sage: #5C7A5F;
+    --sage-light: #EBF1EB;
+    --rose: #C0504D;
+    --rose-light: #FAEEEE;
+    --amber: #D4813A;
+    --amber-light: #FDF3E7;
+    --shadow: 0 2px 12px rgba(26,24,20,0.08);
+    --shadow-lg: 0 8px 32px rgba(26,24,20,0.12);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  /* ── TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--cream);
+  }
+
+  .login-card {
+    background: var(--paper);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+
+  .login-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+
+  .login-sub {
+    color: var(--ink-light);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+  }
+
+  .pin-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+  }
+
+  .pin-dots {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .pin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--ink-faint);
+    transition: all 0.2s;
+  }
+
+  .pin-dot.filled {
+    background: var(--ink);
+    border-color: var(--ink);
+    transform: scale(1.1);
+  }
+
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .num-btn {
+    background: var(--cream);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .num-btn:hover { background: var(--ink-faint); }
+  .num-btn:active { transform: scale(0.94); }
+
+  .num-btn.clear {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  .num-btn.enter {
+    background: var(--ink);
+    color: white;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .num-btn.enter:hover { background: var(--sage); }
+
+  .login-error {
+    color: var(--rose);
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    min-height: 1.2em;
+    transition: opacity 0.3s;
+  }
+
+  /* ── APP HEADER ── */
+  .app-header {
+    background: var(--paper);
+    border-bottom: 1px solid rgba(26,24,20,0.08);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 8px rgba(26,24,20,0.06);
+  }
+
+  .app-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--ink);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .role-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .role-badge.editor { background: var(--sage-light); color: var(--sage); }
+  .role-badge.shopper { background: var(--amber-light); color: var(--amber); }
+
+  .btn-icon {
+    background: none;
+    border: 1px solid var(--ink-faint);
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--ink-light);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .btn-icon:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── TABS ── */
+  .tab-bar {
+    background: var(--paper);
+    border-bottom: 1px solid rgba(26,24,20,0.08);
+    display: flex;
+    padding: 0 1.5rem;
+    gap: 0;
+  }
+
+  .tab {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink-light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+  /* ── MAIN CONTENT ── */
+  .app-content {
+    flex: 1;
+    padding: 1.5rem;
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1.25rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn-primary { background: var(--ink); color: white; }
+  .btn-primary:hover { background: var(--sage); }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--ink-faint);
+    color: var(--ink-light);
+  }
+  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+  .btn-danger { background: var(--rose-light); color: var(--rose); }
+  .btn-danger:hover { background: var(--rose); color: white; }
+
+  .btn-sage { background: var(--sage-light); color: var(--sage); }
+  .btn-sage:hover { background: var(--sage); color: white; }
+
+  /* ── LIST CARDS ── */
+  .list-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .list-card {
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .list-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--sage);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .list-card.archived::before { background: var(--ink-faint); }
+
+  .list-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); border-color: var(--ink-faint); }
+
+  .list-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .list-card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    flex: 1;
+  }
+
+  .list-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    color: var(--ink-light);
+    font-size: 0.8rem;
+  }
+
+  .progress-bar {
+    background: var(--cream);
+    border-radius: 4px;
+    height: 4px;
+    margin-top: 0.75rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--sage);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(26,24,20,0.06);
+  }
+
+  /* ── NEW LIST FORM ── */
+  .new-list-form {
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+
+  .new-list-form.open { display: block; }
+
+  .form-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .field label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 600;
+  }
+
+  .field input, .field textarea, .field select {
+    background: var(--cream);
+    border: 1px solid var(--ink-faint);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .field input:focus, .field textarea:focus {
+    border-color: var(--ink);
+  }
+
+  /* ── SHOPPING LIST VIEW ── */
+  #list-view-screen .app-content {
+    padding-bottom: 6rem;
+  }
+
+  .list-view-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .list-view-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    line-height: 1.15;
+    margin-bottom: 0.35rem;
+  }
+
+  .list-view-meta {
+    color: var(--ink-light);
+    font-size: 0.85rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* ── ADD ITEM AREA ── */
+  .add-item-box {
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .add-item-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-end;
+  }
+
+  .add-item-row .field { flex: 1; }
+
+  .qty-field { width: 80px; flex: none; }
+
+  .suggestions-box {
+    position: absolute;
+    top: calc(100% - 0.5rem);
+    left: 1.25rem;
+    right: 1.25rem;
+    background: white;
+    border: 1px solid var(--ink-faint);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    overflow: hidden;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+  }
+
+  .suggestions-box.open { display: block; }
+
+  .suggestion-item {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .suggestion-item:hover { background: var(--cream); }
+
+  .suggestion-item .sug-icon {
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+
+  /* ── ITEM LIST ── */
+  .items-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .items-group-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+    padding-left: 0.5rem;
+  }
+
+  .item-row {
+    background: var(--paper);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    box-shadow: 0 1px 4px rgba(26,24,20,0.06);
+    transition: all 0.2s;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .item-row:hover { box-shadow: var(--shadow); }
+
+  .item-row.checked {
+    opacity: 0.55;
+  }
+
+  .item-row.checked .item-name {
+    text-decoration: line-through;
+    color: var(--ink-light);
+  }
+
+  .check-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--ink-faint);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.8rem;
+  }
+
+  .item-row.checked .check-circle {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  .item-info { flex: 1; min-width: 0; }
+
+  .item-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s;
+  }
+
+  .item-qty {
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    margin-top: 0.1rem;
+  }
+
+  .item-delete {
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    line-height: 1;
+    transition: all 0.15s;
+    opacity: 0;
+  }
+
+  .item-row:hover .item-delete { opacity: 1; }
+  .item-delete:hover { background: var(--rose-light); color: var(--rose); }
+
+  /* ── EMPTY STATES ── */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--ink-light);
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.4;
+  }
+
+  .empty-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+
+  .empty-desc { font-size: 0.85rem; line-height: 1.6; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,24,20,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--paper);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+  }
+
+  /* ── FLOATING ADD BTN (mobile) ── */
+  .fab {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(26,24,20,0.25);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 50;
+  }
+
+  .fab:hover { transform: scale(1.05); background: var(--sage); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    z-index: 300;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── COMPLETED SUMMARY ── */
+  .completion-banner {
+    background: linear-gradient(135deg, var(--sage-light), #dceadc);
+    border: 1px solid rgba(92,122,95,0.25);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .completion-icon { font-size: 2rem; }
+
+  .completion-text .big { font-family: 'DM Serif Display', serif; font-size: 1.1rem; }
+  .completion-text .small { font-size: 0.8rem; color: var(--sage); margin-top: 0.15rem; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 500px) {
+    .app-content { padding: 1rem; }
+    .app-header { padding: 0.85rem 1rem; }
+    .tab-bar { padding: 0 1rem; }
+    .tab { padding: 0.75rem 0.85rem; font-size: 0.75rem; }
+    .list-card { padding: 1rem 1.1rem 1rem 1.3rem; }
+    .add-item-row { flex-wrap: wrap; }
+    .qty-field { width: 100%; }
+    .fab { display: flex; }
+    .add-item-box .desktop-add { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+<div id="login-screen" class="screen active">
+  <div class="login-card">
+    <div class="login-logo">Our Shop</div>
+    <div class="login-sub">Family Shopping Lists</div>
+    <div class="pin-label">Enter your PIN</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div class="numpad">
+      <button class="num-btn" onclick="pinPress('1')">1</button>
+      <button class="num-btn" onclick="pinPress('2')">2</button>
+      <button class="num-btn" onclick="pinPress('3')">3</button>
+      <button class="num-btn" onclick="pinPress('4')">4</button>
+      <button class="num-btn" onclick="pinPress('5')">5</button>
+      <button class="num-btn" onclick="pinPress('6')">6</button>
+      <button class="num-btn" onclick="pinPress('7')">7</button>
+      <button class="num-btn" onclick="pinPress('8')">8</button>
+      <button class="num-btn" onclick="pinPress('9')">9</button>
+      <button class="num-btn clear" onclick="pinClear()">Clear</button>
+      <button class="num-btn" onclick="pinPress('0')">0</button>
+      <button class="num-btn enter" onclick="pinSubmit()">Go</button>
+    </div>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN APP SCREEN ═══════════════ -->
+<div id="app-screen" class="screen">
+  <div class="app-header">
+    <div class="app-logo">Our Shop</div>
+    <div class="header-right">
+      <span class="role-badge" id="role-badge">Editor</span>
+      <button class="btn-icon" onclick="logout()">Lock</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('active')">Active Lists</div>
+    <div class="tab" onclick="switchTab('archived')">Archive</div>
+  </div>
+
+  <div class="app-content">
+
+    <!-- New list form -->
+    <div class="new-list-form" id="new-list-form">
+      <div class="form-row" style="margin-bottom:0.75rem;">
+        <div class="field">
+          <label>List Name</label>
+          <input type="text" id="new-list-name" placeholder="e.g. Weekly Shop, Tesco Run…" onkeydown="if(event.key==='Enter')createList()">
+        </div>
+      </div>
+      <div class="form-row">
+        <button class="btn btn-primary" onclick="createList()">+ Create List</button>
+        <button class="btn btn-ghost" onclick="closeNewListForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Active / Archive views -->
+    <div id="tab-active">
+      <div class="section-header">
+        <div class="section-title">Shopping Lists</div>
+        <button class="btn btn-primary" id="new-list-btn" onclick="openNewListForm()">+ New List</button>
+      </div>
+      <div class="list-grid" id="active-list-grid"></div>
+    </div>
+
+    <div id="tab-archived" style="display:none;">
+      <div class="section-header">
+        <div class="section-title">Archived</div>
+      </div>
+      <div class="list-grid" id="archived-list-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ LIST VIEW SCREEN ═══════════════ -->
+<div id="list-view-screen" class="screen">
+  <div class="app-header">
+    <button class="btn-icon" onclick="goBack()">← Back</button>
+    <div class="header-right">
+      <span class="role-badge" id="lv-role-badge">Editor</span>
+      <button class="btn-icon" onclick="logout()">Lock</button>
+    </div>
+  </div>
+
+  <div class="app-content">
+    <div class="list-view-header">
+      <div class="list-view-title" id="lv-title">List Name</div>
+      <div class="list-view-meta" id="lv-meta"></div>
+    </div>
+
+    <!-- Completion banner -->
+    <div class="completion-banner" id="completion-banner" style="display:none;">
+      <div class="completion-icon">🎉</div>
+      <div class="completion-text">
+        <div class="big">Shopping done!</div>
+        <div class="small">All items ticked off</div>
+      </div>
+    </div>
+
+    <!-- Add item box (editor only) -->
+    <div class="add-item-box" id="add-item-box">
+      <div class="add-item-row">
+        <div class="field">
+          <label>Add Item</label>
+          <input type="text" id="item-input" placeholder="Type item name…" autocomplete="off"
+            oninput="onItemInput()" onkeydown="onItemKeydown(event)" onfocus="onItemInput()">
+        </div>
+        <div class="field qty-field">
+          <label>Qty</label>
+          <input type="text" id="qty-input" placeholder="e.g. 2, 500g" onkeydown="if(event.key==='Enter')addItem()">
+        </div>
+        <button class="btn btn-primary desktop-add" onclick="addItem()" style="margin-bottom:1px;">Add</button>
+      </div>
+      <div class="suggestions-box" id="suggestions-box"></div>
+    </div>
+
+    <!-- Items -->
+    <div class="items-section" id="items-section"></div>
+
+  </div>
+
+  <!-- FAB for mobile add -->
+  <button class="fab" onclick="document.getElementById('item-input').focus()">+</button>
+</div>
+
+<!-- ═══════════════ CONFIRM MODAL ═══════════════ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-title" id="confirm-title">Confirm</div>
+    <div id="confirm-body" style="color:var(--ink-light);font-size:0.9rem;line-height:1.6;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIG — change these PINs and API URL
+// ══════════════════════════════════════════════
+const CONFIG = {
+  editorPin: '1234',   // Wife's PIN (create / edit)
+  shopperPin: '5678',  // Your PIN  (view / tick off)
+  apiBase: '/api',     // Cloudflare Worker API base
+};
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let state = {
+  role: null,            // 'editor' | 'shopper'
+  lists: [],             // [{id, name, items:[], archived, createdAt}]
+  knownItems: [],        // ['Milk', 'Bread', ...]
+  currentListId: null,
+  currentTab: 'active',
+};
+
+// ══════════════════════════════════════════════
+//  PIN LOGIN
+// ══════════════════════════════════════════════
+let pinBuffer = '';
+
+function pinPress(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  updateDots();
+  if (pinBuffer.length === 4) setTimeout(pinSubmit, 150);
+}
+
+function pinClear() {
+  pinBuffer = '';
+  updateDots();
+  document.getElementById('login-error').textContent = '';
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('dot-' + i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+function pinSubmit() {
+  if (pinBuffer === CONFIG.editorPin) {
+    login('editor');
+  } else if (pinBuffer === CONFIG.shopperPin) {
+    login('shopper');
+  } else {
+    document.getElementById('login-error').textContent = 'Incorrect PIN, try again';
+    pinBuffer = '';
+    updateDots();
+    setTimeout(() => document.getElementById('login-error').textContent = '', 2500);
+  }
+}
+
+function login(role) {
+  state.role = role;
+  sessionStorage.setItem('role', role);
+  showScreen('app-screen');
+  document.getElementById('role-badge').textContent = role === 'editor' ? 'Editor' : 'Shopper';
+  document.getElementById('role-badge').className = 'role-badge ' + role;
+  document.getElementById('lv-role-badge').textContent = role === 'editor' ? 'Editor' : 'Shopper';
+  document.getElementById('lv-role-badge').className = 'role-badge ' + role;
+  // Show/hide editor controls
+  document.getElementById('new-list-btn').style.display = role === 'editor' ? '' : 'none';
+  loadData();
+}
+
+function logout() {
+  state.role = null;
+  sessionStorage.removeItem('role');
+  pinBuffer = '';
+  updateDots();
+  showScreen('login-screen');
+}
+
+// ══════════════════════════════════════════════
+//  SCREENS
+// ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goBack() {
+  showScreen('app-screen');
+  state.currentListId = null;
+  renderLists();
+}
+
+// ══════════════════════════════════════════════
+//  DATA — localStorage with API sync
+// ══════════════════════════════════════════════
+async function loadData() {
+  try {
+    const res = await fetch(CONFIG.apiBase + '/data');
+    if (res.ok) {
+      const remote = await res.json();
+      state.lists = remote.lists || [];
+      state.knownItems = remote.knownItems || [];
+    } else {
+      throw new Error('not ok');
+    }
+  } catch {
+    // Fallback to localStorage
+    const local = localStorage.getItem('ourshop_data');
+    if (local) {
+      const d = JSON.parse(local);
+      state.lists = d.lists || [];
+      state.knownItems = d.knownItems || [];
+    }
+  }
+  renderLists();
+}
+
+async function saveData() {
+  const payload = { lists: state.lists, knownItems: state.knownItems };
+  localStorage.setItem('ourshop_data', JSON.stringify(payload));
+  try {
+    await fetch(CONFIG.apiBase + '/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch { /* silently fails — localStorage is the fallback */ }
+}
+
+// ══════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════
+function switchTab(tab) {
+  state.currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'active') || (i === 1 && tab === 'archived'));
+  });
+  document.getElementById('tab-active').style.display = tab === 'active' ? '' : 'none';
+  document.getElementById('tab-archived').style.display = tab === 'archived' ? '' : 'none';
+  renderLists();
+}
+
+// ══════════════════════════════════════════════
+//  LISTS
+// ══════════════════════════════════════════════
+function renderLists() {
+  const activeLists = state.lists.filter(l => !l.archived);
+  const archivedLists = state.lists.filter(l => l.archived);
+
+  renderListGrid('active-list-grid', activeLists, false);
+  renderListGrid('archived-list-grid', archivedLists, true);
+}
+
+function renderListGrid(containerId, lists, isArchived) {
+  const el = document.getElementById(containerId);
+  if (!lists.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">${isArchived ? '📦' : '🛒'}</div>
+      <div class="empty-title">${isArchived ? 'Nothing archived yet' : 'No lists yet'}</div>
+      <div class="empty-desc">${isArchived ? 'Completed lists will appear here.' : 'Create a new shopping list to get started.'}</div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = lists.map(list => {
+    const total = list.items.length;
+    const done = list.items.filter(i => i.checked).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    const date = new Date(list.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+
+    const actions = state.role === 'editor' ? `
+      <div class="card-actions">
+        ${!isArchived ? `<button class="btn btn-sage" onclick="event.stopPropagation();archiveList('${list.id}')">Archive</button>` : ''}
+        ${isArchived ? `<button class="btn btn-ghost" onclick="event.stopPropagation();restoreList('${list.id}')">Restore</button>` : ''}
+        <button class="btn btn-danger" onclick="event.stopPropagation();confirmDeleteList('${list.id}')">Delete</button>
+      </div>` : '';
+
+    return `<div class="list-card${isArchived ? ' archived' : ''}" onclick="openList('${list.id}')">
+      <div class="list-card-header">
+        <div class="list-card-title">${escHtml(list.name)}</div>
+        <span style="font-size:0.75rem;color:var(--ink-faint);white-space:nowrap;">${date}</span>
+      </div>
+      <div class="list-card-meta">
+        <span>${total} item${total !== 1 ? 's' : ''}</span>
+        <span>·</span>
+        <span>${done} done</span>
+        ${pct === 100 && total > 0 ? '<span style="color:var(--sage);">✓ Complete</span>' : ''}
+      </div>
+      ${total > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+function openNewListForm() {
+  document.getElementById('new-list-form').classList.add('open');
+  document.getElementById('new-list-name').focus();
+}
+
+function closeNewListForm() {
+  document.getElementById('new-list-form').classList.remove('open');
+  document.getElementById('new-list-name').value = '';
+}
+
+async function createList() {
+  const name = document.getElementById('new-list-name').value.trim();
+  if (!name) return;
+  const newList = {
+    id: 'list_' + Date.now(),
+    name,
+    items: [],
+    archived: false,
+    createdAt: new Date().toISOString(),
+  };
+  state.lists.unshift(newList);
+  await saveData();
+  closeNewListForm();
+  openList(newList.id);
+}
+
+async function archiveList(id) {
+  const list = state.lists.find(l => l.id === id);
+  if (list) { list.archived = true; await saveData(); renderLists(); toast('List archived'); }
+}
+
+async function restoreList(id) {
+  const list = state.lists.find(l => l.id === id);
+  if (list) { list.archived = false; await saveData(); renderLists(); toast('List restored'); }
+}
+
+function confirmDeleteList(id) {
+  const list = state.lists.find(l => l.id === id);
+  if (!list) return;
+  showConfirm(
+    'Delete "' + list.name + '"?',
+    'This will permanently remove the list and all its items.',
+    async () => {
+      state.lists = state.lists.filter(l => l.id !== id);
+      await saveData();
+      renderLists();
+      toast('List deleted');
+    }
+  );
+}
+
+// ══════════════════════════════════════════════
+//  LIST VIEW
+// ══════════════════════════════════════════════
+function openList(id) {
+  state.currentListId = id;
+  showScreen('list-view-screen');
+  renderListView();
+
+  // Poll for updates every 15s if shopper
+  if (state.role === 'shopper') {
+    clearInterval(state.pollTimer);
+    state.pollTimer = setInterval(() => refreshList(), 15000);
+  }
+}
+
+async function refreshList() {
+  try {
+    const res = await fetch(CONFIG.apiBase + '/data');
+    if (res.ok) {
+      const remote = await res.json();
+      state.lists = remote.lists || [];
+      state.knownItems = remote.knownItems || [];
+      localStorage.setItem('ourshop_data', JSON.stringify({ lists: state.lists, knownItems: state.knownItems }));
+      if (state.currentListId) renderListView();
+    }
+  } catch { /* offline, no-op */ }
+}
+
+function renderListView() {
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list) return;
+
+  document.getElementById('lv-title').textContent = list.name;
+
+  const total = list.items.length;
+  const done = list.items.filter(i => i.checked).length;
+  const date = new Date(list.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('lv-meta').innerHTML = `
+    <span>${date}</span>
+    <span>·</span>
+    <span>${done} of ${total} done</span>
+  `;
+
+  // Completion banner
+  const banner = document.getElementById('completion-banner');
+  banner.style.display = (total > 0 && done === total) ? '' : 'none';
+
+  // Add item box visibility
+  const addBox = document.getElementById('add-item-box');
+  addBox.style.display = (state.role === 'editor' && !list.archived) ? '' : 'none';
+
+  // Render items
+  const section = document.getElementById('items-section');
+  const pending = list.items.filter(i => !i.checked);
+  const checked = list.items.filter(i => i.checked);
+
+  if (!total) {
+    section.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <div class="empty-title">List is empty</div>
+      <div class="empty-desc">${state.role === 'editor' ? 'Add items above to get started.' : 'No items added yet.'}</div>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  if (pending.length) {
+    pending.forEach(item => { html += itemRowHtml(item, list.archived); });
+  }
+  if (checked.length) {
+    html += `<div class="items-group-label">Checked off (${checked.length})</div>`;
+    checked.forEach(item => { html += itemRowHtml(item, list.archived); });
+  }
+  section.innerHTML = html;
+}
+
+function itemRowHtml(item, archived) {
+  const canDelete = state.role === 'editor' && !archived;
+  const deleteBtn = canDelete
+    ? `<button class="item-delete" onclick="event.stopPropagation();removeItem('${item.id}')" title="Remove">✕</button>`
+    : '';
+  return `<div class="item-row${item.checked ? ' checked' : ''}" onclick="toggleItem('${item.id}')">
+    <div class="check-circle">${item.checked ? '✓' : ''}</div>
+    <div class="item-info">
+      <div class="item-name">${escHtml(item.name)}</div>
+      ${item.qty ? `<div class="item-qty">${escHtml(item.qty)}</div>` : ''}
+    </div>
+    ${deleteBtn}
+  </div>`;
+}
+
+async function toggleItem(itemId) {
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list) return;
+  const item = list.items.find(i => i.id === itemId);
+  if (!item) return;
+  item.checked = !item.checked;
+  await saveData();
+  renderListView();
+}
+
+async function removeItem(itemId) {
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list) return;
+  list.items = list.items.filter(i => i.id !== itemId);
+  await saveData();
+  renderListView();
+}
+
+// ══════════════════════════════════════════════
+//  ADD ITEM + SUGGESTIONS
+// ══════════════════════════════════════════════
+let selectedSuggestion = -1;
+
+function onItemInput() {
+  const val = document.getElementById('item-input').value.trim();
+  if (!val) { hideSuggestions(); return; }
+  const matches = state.knownItems
+    .filter(k => k.toLowerCase().includes(val.toLowerCase()) && k.toLowerCase() !== val.toLowerCase())
+    .slice(0, 8);
+  renderSuggestions(matches, val);
+}
+
+function renderSuggestions(items, query) {
+  const box = document.getElementById('suggestions-box');
+  if (!items.length) { hideSuggestions(); return; }
+  selectedSuggestion = -1;
+  box.innerHTML = items.map((item, i) =>
+    `<div class="suggestion-item" onmousedown="pickSuggestion('${escAttr(item)}')" data-idx="${i}">
+      <span class="sug-icon">⌘</span>${escHtml(item)}
+    </div>`
+  ).join('');
+  box.classList.add('open');
+}
+
+function hideSuggestions() {
+  document.getElementById('suggestions-box').classList.remove('open');
+  selectedSuggestion = -1;
+}
+
+function pickSuggestion(name) {
+  document.getElementById('item-input').value = name;
+  hideSuggestions();
+  document.getElementById('qty-input').focus();
+}
+
+function onItemKeydown(e) {
+  const box = document.getElementById('suggestions-box');
+  const items = box.querySelectorAll('.suggestion-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selectedSuggestion = Math.min(selectedSuggestion + 1, items.length - 1);
+    highlightSuggestion(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selectedSuggestion = Math.max(selectedSuggestion - 1, -1);
+    highlightSuggestion(items);
+  } else if (e.key === 'Enter') {
+    if (selectedSuggestion >= 0 && items[selectedSuggestion]) {
+      pickSuggestion(items[selectedSuggestion].textContent.trim());
+    } else {
+      addItem();
+    }
+  } else if (e.key === 'Escape') {
+    hideSuggestions();
+  }
+}
+
+function highlightSuggestion(items) {
+  items.forEach((el, i) => el.style.background = i === selectedSuggestion ? 'var(--cream)' : '');
+}
+
+async function addItem() {
+  const nameInput = document.getElementById('item-input');
+  const qtyInput = document.getElementById('qty-input');
+  const name = nameInput.value.trim();
+  const qty = qtyInput.value.trim();
+
+  if (!name) { nameInput.focus(); return; }
+
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list) return;
+
+  const newItem = {
+    id: 'item_' + Date.now(),
+    name,
+    qty: qty || '',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  };
+
+  list.items.push(newItem);
+
+  // Learn item
+  if (!state.knownItems.some(k => k.toLowerCase() === name.toLowerCase())) {
+    state.knownItems.push(name);
+    // Keep sorted, max 500
+    state.knownItems.sort((a, b) => a.localeCompare(b));
+    if (state.knownItems.length > 500) state.knownItems.shift();
+  }
+
+  nameInput.value = '';
+  qtyInput.value = '';
+  hideSuggestions();
+  nameInput.focus();
+
+  await saveData();
+  renderListView();
+}
+
+// ══════════════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════════════
+let confirmCallback = null;
+
+function showConfirm(title, body, onOk) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').textContent = body;
+  document.getElementById('confirm-modal').classList.add('open');
+  confirmCallback = onOk;
+  document.getElementById('confirm-ok').onclick = () => { closeModal(); onOk(); };
+}
+
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return String(s).replace(/'/g, "\\'"); }
+
+// Click outside suggestions to close
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('add-item-box')?.contains(e.target)) hideSuggestions();
+});
+
+// Close modal on overlay click
+document.getElementById('confirm-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('confirm-modal')) closeModal();
+});
+
+// Restore session on reload
+window.addEventListener('load', () => {
+  const savedRole = sessionStorage.getItem('role');
+  if (savedRole) login(savedRole);
+});
+</script>
+</body>
+</html>
