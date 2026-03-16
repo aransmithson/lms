@@ -910,21 +910,34 @@ function toggleDark() {
 // ══════════════════════════════════════════
 //  PIN SYSTEM — fetched from KV via /api/pins
 // ══════════════════════════════════════════
+
+// Fallback PINs used when KV is unreachable (e.g. KV not yet bound).
+// Change these to match what you set in KV.
+const FALLBACK_PINS = { editor: '1234', shopper: '5678' };
+
 let pinBuffer = '';
 
 async function loadPins() {
   setLoginMsg('');
   try {
-    const res = await fetch(CONFIG.apiBase + '/pins');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(CONFIG.apiBase + '/pins', { signal: controller.signal });
+    clearTimeout(timeout);
     if (res.ok) {
-      state.pins = await res.json();
-    } else {
-      throw new Error();
+      const data = await res.json();
+      // Validate response looks like pins before trusting it
+      if (data && typeof data.editor === 'string' && typeof data.shopper === 'string') {
+        state.pins = data;
+        return;
+      }
     }
+    throw new Error('bad response');
   } catch {
-    // First-run fallback: KV not yet seeded — show helpful note
-    state.pins = null;
-    setLoginMsg('Could not load PINs — check KV setup');
+    // KV not set up yet, network error, or bad response — use fallback silently
+    state.pins = FALLBACK_PINS;
+    setLoginMsg('⚠️ Using default PINs — KV not connected');
+    setTimeout(() => setLoginMsg(''), 4000);
   }
 }
 
@@ -955,8 +968,8 @@ function updateDots() {
 
 function pinSubmit() {
   if (!state.pins) {
-    setLoginMsg('PINs not loaded yet. Please refresh.', true);
-    pinBuffer = ''; updateDots(); return;
+    // Shouldn't happen, but just in case loadPins hasn't resolved yet
+    state.pins = FALLBACK_PINS;
   }
   if (pinBuffer === state.pins.editor) {
     login('editor');
@@ -1366,7 +1379,7 @@ document.getElementById('confirm-modal').addEventListener('click',e=>{
 window.addEventListener('load', async()=>{
   await loadPins();
   const saved = sessionStorage.getItem('role');
-  if (saved && state.pins) login(saved);
+  if (saved) login(saved);
 });
 </script>
 </body>
