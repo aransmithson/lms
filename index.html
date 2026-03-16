@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Our Shop</title>
+<title>Smithson's Shopping List</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ══ LIGHT THEME ══ */
   :root {
     --cream: #F5F0E8;
     --paper: #FAF7F2;
+    --paper2: #F2EDE4;
     --ink: #1A1814;
     --ink-light: #6B6560;
     --ink-faint: #C8C2BA;
@@ -19,9 +21,33 @@
     --rose-light: #FAEEEE;
     --amber: #D4813A;
     --amber-light: #FDF3E7;
+    --border: rgba(26,24,20,0.10);
     --shadow: 0 2px 12px rgba(26,24,20,0.08);
     --shadow-lg: 0 8px 32px rgba(26,24,20,0.12);
     --radius: 12px;
+    --toggle-bg: #D0CAC0;
+    --toggle-knob: white;
+  }
+
+  /* ══ DARK THEME ══ */
+  [data-theme="dark"] {
+    --cream: #151310;
+    --paper: #1E1B17;
+    --paper2: #252118;
+    --ink: #EDE8DF;
+    --ink-light: #9E9890;
+    --ink-faint: #3D3930;
+    --sage: #7AAB7E;
+    --sage-light: #1E2D1F;
+    --rose: #D96B68;
+    --rose-light: #2D1A1A;
+    --amber: #E09450;
+    --amber-light: #2D2010;
+    --border: rgba(255,255,255,0.07);
+    --shadow: 0 2px 12px rgba(0,0,0,0.25);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+    --toggle-bg: #5C7A5F;
+    --toggle-knob: #EDE8DF;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,30 +58,60 @@
     color: var(--ink);
     min-height: 100vh;
     font-size: 15px;
+    transition: background 0.3s, color 0.3s;
   }
 
-  /* ── TEXTURE OVERLAY ── */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 9999;
   }
 
-  /* ── SCREENS ── */
+  /* ══ DARK MODE TOGGLE ══ */
+  .dark-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .dark-toggle-track {
+    width: 34px;
+    height: 19px;
+    background: var(--toggle-bg);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+  .dark-toggle-knob {
+    position: absolute;
+    top: 2.5px;
+    left: 2.5px;
+    width: 14px;
+    height: 14px;
+    background: var(--toggle-knob);
+    border-radius: 50%;
+    transition: transform 0.25s ease, background 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  [data-theme="dark"] .dark-toggle-knob { transform: translateX(15px); }
+  .dark-toggle-icon { font-size: 0.8rem; line-height: 1; }
+
+  /* ══ SCREENS ══ */
   .screen { display: none; min-height: 100vh; }
   .screen.active { display: flex; flex-direction: column; }
 
-  /* ── LOGIN ── */
+  /* ══ LOGIN ══ */
   #login-screen {
     align-items: center;
     justify-content: center;
     padding: 2rem;
     background: var(--cream);
   }
-
   .login-card {
     background: var(--paper);
     border-radius: 20px;
@@ -64,39 +120,36 @@
     max-width: 380px;
     box-shadow: var(--shadow-lg);
     text-align: center;
+    border: 1px solid var(--border);
   }
-
   .login-logo {
     font-family: 'DM Serif Display', serif;
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     line-height: 1;
     color: var(--ink);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
   }
-
+  .login-logo span { font-style: italic; color: var(--sage); }
   .login-sub {
     color: var(--ink-light);
-    font-size: 0.85rem;
-    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-bottom: 2.5rem;
   }
-
   .pin-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ink-light);
     margin-bottom: 1rem;
   }
-
   .pin-dots {
     display: flex;
     gap: 12px;
     justify-content: center;
     margin-bottom: 2rem;
   }
-
   .pin-dot {
     width: 14px;
     height: 14px;
@@ -104,13 +157,11 @@
     border: 2px solid var(--ink-faint);
     transition: all 0.2s;
   }
-
   .pin-dot.filled {
     background: var(--ink);
     border-color: var(--ink);
     transform: scale(1.1);
   }
-
   .numpad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -118,10 +169,9 @@
     max-width: 260px;
     margin: 0 auto;
   }
-
   .num-btn {
-    background: var(--cream);
-    border: none;
+    background: var(--paper2);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1rem;
     font-family: 'DM Sans', sans-serif;
@@ -135,99 +185,87 @@
     align-items: center;
     justify-content: center;
   }
-
   .num-btn:hover { background: var(--ink-faint); }
-  .num-btn:active { transform: scale(0.94); }
-
+  .num-btn:active { transform: scale(0.93); }
   .num-btn.clear {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--ink-light);
   }
-
   .num-btn.enter {
     background: var(--ink);
-    color: white;
+    color: var(--paper);
+    border-color: var(--ink);
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
-
-  .num-btn.enter:hover { background: var(--sage); }
-
+  .num-btn.enter:hover { background: var(--sage); border-color: var(--sage); }
   .login-error {
     color: var(--rose);
     font-size: 0.85rem;
     margin-top: 1rem;
     min-height: 1.2em;
-    transition: opacity 0.3s;
+  }
+  .login-loading {
+    color: var(--ink-light);
+    font-size: 0.82rem;
+    margin-top: 0.4rem;
+    min-height: 1.2em;
   }
 
-  /* ── APP HEADER ── */
+  /* ══ APP HEADER ══ */
   .app-header {
     background: var(--paper);
-    border-bottom: 1px solid rgba(26,24,20,0.08);
-    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 8px rgba(26,24,20,0.06);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    transition: background 0.3s, border-color 0.3s;
   }
-
-  .app-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    color: var(--ink);
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
+  .app-logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--ink); line-height: 1; }
+  .app-logo span { font-style: italic; color: var(--sage); }
+  .header-right { display: flex; align-items: center; gap: 0.65rem; }
   .role-badge {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 0.3rem 0.7rem;
+    padding: 0.28rem 0.65rem;
     border-radius: 20px;
     font-weight: 600;
   }
-
   .role-badge.editor { background: var(--sage-light); color: var(--sage); }
   .role-badge.shopper { background: var(--amber-light); color: var(--amber); }
-
   .btn-icon {
     background: none;
     border: 1px solid var(--ink-faint);
     border-radius: 8px;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.75rem;
+    padding: 0.38rem 0.7rem;
+    font-size: 0.73rem;
     cursor: pointer;
     color: var(--ink-light);
     font-family: 'DM Sans', sans-serif;
     transition: all 0.15s;
   }
-
   .btn-icon:hover { border-color: var(--ink); color: var(--ink); }
 
-  /* ── TABS ── */
+  /* ══ TABS ══ */
   .tab-bar {
     background: var(--paper);
-    border-bottom: 1px solid rgba(26,24,20,0.08);
+    border-bottom: 1px solid var(--border);
     display: flex;
     padding: 0 1.5rem;
-    gap: 0;
+    transition: background 0.3s;
   }
-
   .tab {
-    padding: 0.85rem 1.25rem;
-    font-size: 0.8rem;
+    padding: 0.8rem 1.1rem;
+    font-size: 0.78rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-weight: 600;
@@ -237,10 +275,9 @@
     transition: all 0.2s;
     white-space: nowrap;
   }
+  .tab.active { color: var(--ink); border-bottom-color: var(--sage); }
 
-  .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
-
-  /* ── MAIN CONTENT ── */
+  /* ══ MAIN CONTENT ══ */
   .app-content {
     flex: 1;
     padding: 1.5rem;
@@ -249,24 +286,20 @@
     margin: 0 auto;
   }
 
-  /* ── SECTION HEADER ── */
+  /* ══ SECTION HEADER ══ */
   .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1.25rem;
   }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
 
-  .section-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-  }
-
-  /* ── BUTTONS ── */
+  /* ══ BUTTONS ══ */
   .btn {
     border: none;
     border-radius: 10px;
-    padding: 0.65rem 1.25rem;
+    padding: 0.62rem 1.2rem;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
@@ -275,279 +308,231 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    white-space: nowrap;
   }
-
-  .btn-primary { background: var(--ink); color: white; }
+  .btn-primary { background: var(--ink); color: var(--paper); }
   .btn-primary:hover { background: var(--sage); }
-
-  .btn-ghost {
-    background: none;
-    border: 1px solid var(--ink-faint);
-    color: var(--ink-light);
-  }
+  .btn-ghost { background: none; border: 1px solid var(--ink-faint); color: var(--ink-light); }
   .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
-
   .btn-danger { background: var(--rose-light); color: var(--rose); }
   .btn-danger:hover { background: var(--rose); color: white; }
-
   .btn-sage { background: var(--sage-light); color: var(--sage); }
   .btn-sage:hover { background: var(--sage); color: white; }
 
-  /* ── LIST CARDS ── */
-  .list-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
+  /* ══ LIST CARDS ══ */
+  .list-grid { display: flex; flex-direction: column; gap: 1rem; }
   .list-card {
     background: var(--paper);
     border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
+    padding: 1.2rem 1.4rem 1.2rem 1.5rem;
     box-shadow: var(--shadow);
     cursor: pointer;
     transition: all 0.2s;
-    border: 2px solid transparent;
+    border: 1px solid var(--border);
     position: relative;
     overflow: hidden;
   }
-
   .list-card::before {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    left: 0; top: 0; bottom: 0;
     width: 4px;
     background: var(--sage);
     border-radius: 4px 0 0 4px;
   }
-
   .list-card.archived::before { background: var(--ink-faint); }
+  .list-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .list-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .list-card-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; line-height: 1.2; flex: 1; }
+  .list-card-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; color: var(--ink-light); font-size: 0.78rem; }
+  .progress-bar { background: var(--paper2); border-radius: 4px; height: 3px; margin-top: 0.65rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--sage); border-radius: 4px; transition: width 0.4s ease; }
+  .card-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.65rem; border-top: 1px solid var(--border); }
 
-  .list-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); border-color: var(--ink-faint); }
-
-  .list-card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .list-card-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.2rem;
-    line-height: 1.2;
-    flex: 1;
-  }
-
-  .list-card-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    color: var(--ink-light);
-    font-size: 0.8rem;
-  }
-
-  .progress-bar {
-    background: var(--cream);
-    border-radius: 4px;
-    height: 4px;
-    margin-top: 0.75rem;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--sage);
-    border-radius: 4px;
-    transition: width 0.4s ease;
-  }
-
-  .card-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(26,24,20,0.06);
-  }
-
-  /* ── NEW LIST FORM ── */
+  /* ══ NEW LIST FORM ══ */
   .new-list-form {
     background: var(--paper);
     border-radius: var(--radius);
-    padding: 1.5rem;
+    padding: 1.4rem;
     box-shadow: var(--shadow);
     margin-bottom: 1.5rem;
     display: none;
+    border: 1px solid var(--border);
   }
-
   .new-list-form.open { display: block; }
-
-  .form-row {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-end;
-  }
-
-  .field {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
+  .form-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+  .field { flex: 1; display: flex; flex-direction: column; gap: 0.35rem; }
   .field label {
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     color: var(--ink-light);
     font-weight: 600;
   }
-
-  .field input, .field textarea, .field select {
-    background: var(--cream);
+  .field input {
+    background: var(--paper2);
     border: 1px solid var(--ink-faint);
     border-radius: 8px;
-    padding: 0.65rem 0.9rem;
+    padding: 0.6rem 0.85rem;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.95rem;
     color: var(--ink);
     outline: none;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background 0.3s;
     width: 100%;
   }
+  .field input::placeholder { color: var(--ink-faint); }
+  .field input:focus { border-color: var(--sage); }
 
-  .field input:focus, .field textarea:focus {
-    border-color: var(--ink);
-  }
+  /* ══ LIST VIEW ══ */
+  #list-view-screen .app-content { padding-bottom: 5rem; }
+  .list-view-header { margin-bottom: 1.4rem; }
+  .list-view-title { font-family: 'DM Serif Display', serif; font-size: 1.9rem; line-height: 1.15; margin-bottom: 0.3rem; }
+  .list-view-meta { color: var(--ink-light); font-size: 0.82rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
 
-  /* ── SHOPPING LIST VIEW ── */
-  #list-view-screen .app-content {
-    padding-bottom: 6rem;
-  }
-
-  .list-view-header {
-    margin-bottom: 1.5rem;
-  }
-
-  .list-view-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    line-height: 1.15;
-    margin-bottom: 0.35rem;
-  }
-
-  .list-view-meta {
-    color: var(--ink-light);
-    font-size: 0.85rem;
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  /* ── ADD ITEM AREA ── */
+  /* ══ ADD ITEM BOX ══ */
   .add-item-box {
     background: var(--paper);
     border-radius: var(--radius);
-    padding: 1.25rem;
+    padding: 1.1rem 1.2rem;
     box-shadow: var(--shadow);
     margin-bottom: 1.5rem;
     position: relative;
+    border: 1px solid var(--border);
   }
-
   .add-item-row {
     display: flex;
-    gap: 0.6rem;
+    gap: 0.5rem;
     align-items: flex-end;
   }
+  .ai-field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .ai-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 600;
+  }
+  .ai-input {
+    background: var(--paper2);
+    border: 1px solid var(--ink-faint);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s, background 0.3s;
+    width: 100%;
+  }
+  .ai-input::placeholder { color: var(--ink-faint); }
+  .ai-input:focus { border-color: var(--sage); }
+  .ai-select {
+    background: var(--paper2);
+    border: 1px solid var(--ink-faint);
+    border-radius: 8px;
+    padding: 0.6rem 0.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s, background 0.3s;
+    width: 100%;
+    cursor: pointer;
+    height: 38px;
+  }
+  .ai-select:focus { border-color: var(--sage); }
+  .ai-select option { background: var(--paper); color: var(--ink); }
 
-  .add-item-row .field { flex: 1; }
+  .ai-field-item  { flex: 1; min-width: 0; }
+  .ai-field-qty   { width: 70px; flex-shrink: 0; }
+  .ai-field-aisle { width: 125px; flex-shrink: 0; }
 
-  .qty-field { width: 80px; flex: none; }
+  .btn-add-item {
+    background: var(--sage);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    align-self: flex-end;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+  }
+  .btn-add-item:hover { background: var(--ink); }
+  .btn-add-item:active { transform: scale(0.96); }
 
   .suggestions-box {
     position: absolute;
-    top: calc(100% - 0.5rem);
-    left: 1.25rem;
-    right: 1.25rem;
-    background: white;
+    top: calc(100% - 0.3rem);
+    left: 1.2rem; right: 1.2rem;
+    background: var(--paper);
     border: 1px solid var(--ink-faint);
     border-radius: 10px;
     box-shadow: var(--shadow-lg);
     z-index: 50;
-    overflow: hidden;
     max-height: 200px;
     overflow-y: auto;
     display: none;
   }
-
   .suggestions-box.open { display: block; }
-
   .suggestion-item {
-    padding: 0.6rem 1rem;
+    padding: 0.55rem 1rem;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     transition: background 0.1s;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: var(--ink);
   }
+  .suggestion-item:hover { background: var(--paper2); }
+  .sug-icon { color: var(--ink-faint); font-size: 0.75rem; }
 
-  .suggestion-item:hover { background: var(--cream); }
-
-  .suggestion-item .sug-icon {
-    color: var(--ink-faint);
-    font-size: 0.8rem;
-  }
-
-  /* ── ITEM LIST ── */
-  .items-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  .items-group-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
+  /* ══ AISLE GROUPING ══ */
+  .aisle-group { margin-bottom: 1.1rem; }
+  .aisle-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
     text-transform: uppercase;
     color: var(--ink-faint);
-    font-weight: 600;
-    margin-top: 1rem;
+    font-weight: 700;
     margin-bottom: 0.4rem;
-    padding-left: 0.5rem;
+    padding: 0 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
+  .aisle-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .aisle-items { display: flex; flex-direction: column; gap: 0.4rem; }
 
+  /* ══ ITEM ROWS ══ */
   .item-row {
     background: var(--paper);
     border-radius: 10px;
-    padding: 0.9rem 1.1rem;
+    padding: 0.7rem 1rem;
     display: flex;
     align-items: center;
-    gap: 0.9rem;
-    box-shadow: 0 1px 4px rgba(26,24,20,0.06);
+    gap: 0.75rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     transition: all 0.2s;
     cursor: pointer;
     user-select: none;
+    border: 1px solid var(--border);
   }
-
   .item-row:hover { box-shadow: var(--shadow); }
-
-  .item-row.checked {
-    opacity: 0.55;
-  }
-
-  .item-row.checked .item-name {
-    text-decoration: line-through;
-    color: var(--ink-light);
-  }
-
+  .item-row.checked { opacity: 0.48; }
+  .item-row.checked .item-name { text-decoration: line-through; color: var(--ink-light); }
   .check-circle {
-    width: 26px;
-    height: 26px;
+    width: 24px; height: 24px;
     border-radius: 50%;
     border: 2px solid var(--ink-faint);
     flex-shrink: 0;
@@ -555,74 +540,81 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    font-size: 0.8rem;
-  }
-
-  .item-row.checked .check-circle {
-    background: var(--sage);
-    border-color: var(--sage);
+    font-size: 0.7rem;
     color: white;
   }
+  .item-row.checked .check-circle { background: var(--sage); border-color: var(--sage); }
 
-  .item-info { flex: 1; min-width: 0; }
-
+  /* Inline name + qty on same line */
+  .item-inline {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    overflow: hidden;
+  }
   .item-name {
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     transition: all 0.2s;
+    font-size: 0.93rem;
   }
-
-  .item-qty {
-    font-size: 0.78rem;
+  .item-qty-badge {
+    font-size: 0.73rem;
     color: var(--ink-light);
-    margin-top: 0.1rem;
+    background: var(--paper2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.05rem 0.42rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: 500;
   }
-
+  .item-row.checked .item-qty-badge { opacity: 0.6; }
   .item-delete {
     background: none;
     border: none;
     color: var(--ink-faint);
     cursor: pointer;
-    padding: 0.3rem;
+    padding: 0.25rem;
     border-radius: 6px;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     line-height: 1;
     transition: all 0.15s;
     opacity: 0;
+    flex-shrink: 0;
   }
-
   .item-row:hover .item-delete { opacity: 1; }
   .item-delete:hover { background: var(--rose-light); color: var(--rose); }
 
-  /* ── EMPTY STATES ── */
-  .empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: var(--ink-light);
+  /* ══ CHECKED GROUP ══ */
+  .checked-group-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 1.25rem 0 0.4rem;
+    padding: 0 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
+  .checked-group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  .empty-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.75rem;
-    opacity: 0.4;
-  }
+  /* ══ EMPTY STATES ══ */
+  .empty-state { text-align: center; padding: 3rem 2rem; color: var(--ink-light); }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+  .empty-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--ink); margin-bottom: 0.35rem; }
+  .empty-desc { font-size: 0.83rem; line-height: 1.6; }
 
-  .empty-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.2rem;
-    color: var(--ink);
-    margin-bottom: 0.35rem;
-  }
-
-  .empty-desc { font-size: 0.85rem; line-height: 1.6; }
-
-  /* ── MODAL ── */
+  /* ══ MODAL ══ */
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(26,24,20,0.5);
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
     backdrop-filter: blur(4px);
     z-index: 200;
     display: none;
@@ -630,9 +622,7 @@
     justify-content: center;
     padding: 1.5rem;
   }
-
   .modal-overlay.open { display: flex; }
-
   .modal {
     background: var(--paper);
     border-radius: 16px;
@@ -640,107 +630,88 @@
     width: 100%;
     max-width: 420px;
     box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
     animation: slideUp 0.25s ease;
   }
-
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
   }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.35rem; margin-bottom: 1rem; }
+  .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.4rem; }
 
-  .modal-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .modal-actions {
+  /* ══ COMPLETION BANNER ══ */
+  .completion-banner {
+    background: var(--sage-light);
+    border: 1px solid rgba(92,122,95,0.2);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.4rem;
     display: flex;
-    gap: 0.75rem;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
   }
+  .completion-icon { font-size: 1.8rem; }
+  .completion-text .big { font-family: 'DM Serif Display', serif; font-size: 1rem; }
+  .completion-text .small { font-size: 0.78rem; color: var(--sage); margin-top: 0.1rem; }
 
-  /* ── FLOATING ADD BTN (mobile) ── */
+  /* ══ FAB ══ */
   .fab {
     position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    background: var(--ink);
+    bottom: 1.5rem; right: 1.5rem;
+    background: var(--sage);
     color: white;
     border: none;
     border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    font-size: 1.5rem;
+    width: 52px; height: 52px;
+    font-size: 1.4rem;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(26,24,20,0.25);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     display: none;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
     z-index: 50;
   }
+  .fab:hover { transform: scale(1.06); background: var(--ink); }
 
-  .fab:hover { transform: scale(1.05); background: var(--sage); }
-
-  /* ── TOAST ── */
+  /* ══ TOAST ══ */
   .toast {
     position: fixed;
-    bottom: 2rem;
-    left: 50%;
+    bottom: 2rem; left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: var(--ink);
-    color: white;
-    padding: 0.75rem 1.5rem;
+    background: var(--ink); color: var(--paper);
+    padding: 0.7rem 1.4rem;
     border-radius: 30px;
-    font-size: 0.85rem;
+    font-size: 0.83rem;
     z-index: 300;
     transition: transform 0.3s ease;
     white-space: nowrap;
     box-shadow: var(--shadow-lg);
   }
-
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ── COMPLETED SUMMARY ── */
-  .completion-banner {
-    background: linear-gradient(135deg, var(--sage-light), #dceadc);
-    border: 1px solid rgba(92,122,95,0.25);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .completion-icon { font-size: 2rem; }
-
-  .completion-text .big { font-family: 'DM Serif Display', serif; font-size: 1.1rem; }
-  .completion-text .small { font-size: 0.8rem; color: var(--sage); margin-top: 0.15rem; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 500px) {
+  /* ══ RESPONSIVE ══ */
+  @media (max-width: 520px) {
     .app-content { padding: 1rem; }
-    .app-header { padding: 0.85rem 1rem; }
+    .app-header { padding: 0.75rem 1rem; }
     .tab-bar { padding: 0 1rem; }
-    .tab { padding: 0.75rem 0.85rem; font-size: 0.75rem; }
-    .list-card { padding: 1rem 1.1rem 1rem 1.3rem; }
+    .tab { padding: 0.7rem 0.8rem; font-size: 0.72rem; }
     .add-item-row { flex-wrap: wrap; }
-    .qty-field { width: 100%; }
+    .ai-field-aisle { width: 100%; }
+    .ai-field-qty { width: 70px; }
     .fab { display: flex; }
-    .add-item-box .desktop-add { display: none; }
+    .btn-add-item.desktop-only { display: none; }
   }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+<!-- ══════════════ LOGIN ══════════════ -->
 <div id="login-screen" class="screen active">
   <div class="login-card">
-    <div class="login-logo">Our Shop</div>
-    <div class="login-sub">Family Shopping Lists</div>
+    <div class="login-logo">Smithson<span>'s</span></div>
+    <div class="login-sub">Shopping List</div>
     <div class="pin-label">Enter your PIN</div>
     <div class="pin-dots">
       <div class="pin-dot" id="dot-0"></div>
@@ -763,27 +734,29 @@
       <button class="num-btn enter" onclick="pinSubmit()">Go</button>
     </div>
     <div class="login-error" id="login-error"></div>
+    <div class="login-loading" id="login-loading"></div>
   </div>
 </div>
 
-<!-- ═══════════════ MAIN APP SCREEN ═══════════════ -->
+<!-- ══════════════ MAIN APP ══════════════ -->
 <div id="app-screen" class="screen">
   <div class="app-header">
-    <div class="app-logo">Our Shop</div>
+    <div class="app-logo">Smithson<span>'s</span></div>
     <div class="header-right">
+      <div class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">
+        <span class="dark-toggle-icon">☀️</span>
+        <div class="dark-toggle-track"><div class="dark-toggle-knob"></div></div>
+        <span class="dark-toggle-icon">🌙</span>
+      </div>
       <span class="role-badge" id="role-badge">Editor</span>
       <button class="btn-icon" onclick="logout()">Lock</button>
     </div>
   </div>
-
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('active')">Active Lists</div>
     <div class="tab" onclick="switchTab('archived')">Archive</div>
   </div>
-
   <div class="app-content">
-
-    <!-- New list form -->
     <div class="new-list-form" id="new-list-form">
       <div class="form-row" style="margin-bottom:0.75rem;">
         <div class="field">
@@ -796,8 +769,6 @@
         <button class="btn btn-ghost" onclick="closeNewListForm()">Cancel</button>
       </div>
     </div>
-
-    <!-- Active / Archive views -->
     <div id="tab-active">
       <div class="section-header">
         <div class="section-title">Shopping Lists</div>
@@ -805,34 +776,34 @@
       </div>
       <div class="list-grid" id="active-list-grid"></div>
     </div>
-
     <div id="tab-archived" style="display:none;">
       <div class="section-header">
         <div class="section-title">Archived</div>
       </div>
       <div class="list-grid" id="archived-list-grid"></div>
     </div>
-
   </div>
 </div>
 
-<!-- ═══════════════ LIST VIEW SCREEN ═══════════════ -->
+<!-- ══════════════ LIST VIEW ══════════════ -->
 <div id="list-view-screen" class="screen">
   <div class="app-header">
     <button class="btn-icon" onclick="goBack()">← Back</button>
     <div class="header-right">
+      <div class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">
+        <span class="dark-toggle-icon">☀️</span>
+        <div class="dark-toggle-track"><div class="dark-toggle-knob"></div></div>
+        <span class="dark-toggle-icon">🌙</span>
+      </div>
       <span class="role-badge" id="lv-role-badge">Editor</span>
       <button class="btn-icon" onclick="logout()">Lock</button>
     </div>
   </div>
-
   <div class="app-content">
     <div class="list-view-header">
-      <div class="list-view-title" id="lv-title">List Name</div>
+      <div class="list-view-title" id="lv-title">List</div>
       <div class="list-view-meta" id="lv-meta"></div>
     </div>
-
-    <!-- Completion banner -->
     <div class="completion-banner" id="completion-banner" style="display:none;">
       <div class="completion-icon">🎉</div>
       <div class="completion-text">
@@ -840,38 +811,53 @@
         <div class="small">All items ticked off</div>
       </div>
     </div>
-
-    <!-- Add item box (editor only) -->
+    <!-- Add Item -->
     <div class="add-item-box" id="add-item-box">
       <div class="add-item-row">
-        <div class="field">
-          <label>Add Item</label>
-          <input type="text" id="item-input" placeholder="Type item name…" autocomplete="off"
+        <div class="ai-field ai-field-item">
+          <span class="ai-label">Item</span>
+          <input class="ai-input" type="text" id="item-input" placeholder="Type item name…" autocomplete="off"
             oninput="onItemInput()" onkeydown="onItemKeydown(event)" onfocus="onItemInput()">
         </div>
-        <div class="field qty-field">
-          <label>Qty</label>
-          <input type="text" id="qty-input" placeholder="e.g. 2, 500g" onkeydown="if(event.key==='Enter')addItem()">
+        <div class="ai-field ai-field-qty">
+          <span class="ai-label">Qty</span>
+          <input class="ai-input" type="text" id="qty-input" placeholder="1" value="1" onkeydown="if(event.key==='Enter')addItem()">
         </div>
-        <button class="btn btn-primary desktop-add" onclick="addItem()" style="margin-bottom:1px;">Add</button>
+        <div class="ai-field ai-field-aisle">
+          <span class="ai-label">Aisle</span>
+          <select class="ai-select" id="aisle-input">
+            <option value="General">General</option>
+            <option value="Fruit &amp; Veg">Fruit &amp; Veg</option>
+            <option value="Meat &amp; Fish">Meat &amp; Fish</option>
+            <option value="Dairy &amp; Eggs">Dairy &amp; Eggs</option>
+            <option value="Bakery">Bakery</option>
+            <option value="Frozen">Frozen</option>
+            <option value="Tins &amp; Jars">Tins &amp; Jars</option>
+            <option value="Pasta &amp; Rice">Pasta &amp; Rice</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Condiments">Condiments</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Toiletries">Toiletries</option>
+            <option value="Baby">Baby</option>
+            <option value="Pet">Pet</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <button class="btn-add-item desktop-only" onclick="addItem()">+ Add</button>
       </div>
       <div class="suggestions-box" id="suggestions-box"></div>
     </div>
-
-    <!-- Items -->
-    <div class="items-section" id="items-section"></div>
-
+    <div id="items-section"></div>
   </div>
-
-  <!-- FAB for mobile add -->
   <button class="fab" onclick="document.getElementById('item-input').focus()">+</button>
 </div>
 
-<!-- ═══════════════ CONFIRM MODAL ═══════════════ -->
+<!-- ══════════════ CONFIRM MODAL ══════════════ -->
 <div class="modal-overlay" id="confirm-modal">
   <div class="modal">
     <div class="modal-title" id="confirm-title">Confirm</div>
-    <div id="confirm-body" style="color:var(--ink-light);font-size:0.9rem;line-height:1.6;"></div>
+    <div id="confirm-body" style="color:var(--ink-light);font-size:0.88rem;line-height:1.6;"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-danger" id="confirm-ok">Confirm</button>
@@ -882,30 +868,72 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-//  CONFIG — change these PINs and API URL
-// ══════════════════════════════════════════════
-const CONFIG = {
-  editorPin: '1234',   // Wife's PIN (create / edit)
-  shopperPin: '5678',  // Your PIN  (view / tick off)
-  apiBase: '/api',     // Cloudflare Worker API base
-};
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+const CONFIG = { apiBase: '/api' };
 
-// ══════════════════════════════════════════════
+const AISLE_ORDER = [
+  'Fruit & Veg','Meat & Fish','Dairy & Eggs','Bakery','Frozen',
+  'Tins & Jars','Pasta & Rice','Snacks','Drinks','Condiments',
+  'Cleaning','Toiletries','Baby','Pet','General','Other'
+];
+
+// ══════════════════════════════════════════
 //  STATE
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 let state = {
-  role: null,            // 'editor' | 'shopper'
-  lists: [],             // [{id, name, items:[], archived, createdAt}]
-  knownItems: [],        // ['Milk', 'Bread', ...]
+  role: null,
+  lists: [],
+  knownItems: [],   // [{name, aisle}, ...]
+  pins: null,       // {editor:'xxxx', shopper:'xxxx'}
   currentListId: null,
   currentTab: 'active',
+  pollTimer: null,
 };
 
-// ══════════════════════════════════════════════
-//  PIN LOGIN
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
+//  DARK MODE
+// ══════════════════════════════════════════
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  localStorage.setItem('smithsons_theme', dark ? 'dark' : 'light');
+}
+function toggleDark() {
+  applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark');
+}
+// Restore immediately before paint
+(function() {
+  if (localStorage.getItem('smithsons_theme') === 'dark') applyTheme(true);
+})();
+
+// ══════════════════════════════════════════
+//  PIN SYSTEM — fetched from KV via /api/pins
+// ══════════════════════════════════════════
 let pinBuffer = '';
+
+async function loadPins() {
+  setLoginMsg('');
+  try {
+    const res = await fetch(CONFIG.apiBase + '/pins');
+    if (res.ok) {
+      state.pins = await res.json();
+    } else {
+      throw new Error();
+    }
+  } catch {
+    // First-run fallback: KV not yet seeded — show helpful note
+    state.pins = null;
+    setLoginMsg('Could not load PINs — check KV setup');
+  }
+}
+
+function setLoginMsg(msg, isError) {
+  const errEl = document.getElementById('login-error');
+  const ldEl  = document.getElementById('login-loading');
+  if (isError) { errEl.textContent = msg; ldEl.textContent = ''; }
+  else         { ldEl.textContent = msg;  errEl.textContent = ''; }
+}
 
 function pinPress(d) {
   if (pinBuffer.length >= 4) return;
@@ -921,20 +949,22 @@ function pinClear() {
 }
 
 function updateDots() {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 4; i++)
     document.getElementById('dot-' + i).classList.toggle('filled', i < pinBuffer.length);
-  }
 }
 
 function pinSubmit() {
-  if (pinBuffer === CONFIG.editorPin) {
+  if (!state.pins) {
+    setLoginMsg('PINs not loaded yet. Please refresh.', true);
+    pinBuffer = ''; updateDots(); return;
+  }
+  if (pinBuffer === state.pins.editor) {
     login('editor');
-  } else if (pinBuffer === CONFIG.shopperPin) {
+  } else if (pinBuffer === state.pins.shopper) {
     login('shopper');
   } else {
-    document.getElementById('login-error').textContent = 'Incorrect PIN, try again';
-    pinBuffer = '';
-    updateDots();
+    setLoginMsg('Incorrect PIN, try again', true);
+    pinBuffer = ''; updateDots();
     setTimeout(() => document.getElementById('login-error').textContent = '', 2500);
   }
 }
@@ -942,135 +972,124 @@ function pinSubmit() {
 function login(role) {
   state.role = role;
   sessionStorage.setItem('role', role);
-  showScreen('app-screen');
-  document.getElementById('role-badge').textContent = role === 'editor' ? 'Editor' : 'Shopper';
-  document.getElementById('role-badge').className = 'role-badge ' + role;
-  document.getElementById('lv-role-badge').textContent = role === 'editor' ? 'Editor' : 'Shopper';
-  document.getElementById('lv-role-badge').className = 'role-badge ' + role;
-  // Show/hide editor controls
+  const label = role === 'editor' ? 'Editor' : 'Shopper';
+  ['role-badge','lv-role-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent = label;
+    el.className = 'role-badge ' + role;
+  });
   document.getElementById('new-list-btn').style.display = role === 'editor' ? '' : 'none';
+  showScreen('app-screen');
   loadData();
 }
 
 function logout() {
   state.role = null;
   sessionStorage.removeItem('role');
-  pinBuffer = '';
-  updateDots();
+  pinBuffer = ''; updateDots();
   showScreen('login-screen');
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  SCREENS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
 function goBack() {
-  showScreen('app-screen');
+  clearInterval(state.pollTimer);
   state.currentListId = null;
+  showScreen('app-screen');
   renderLists();
 }
 
-// ══════════════════════════════════════════════
-//  DATA — localStorage with API sync
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
 async function loadData() {
   try {
     const res = await fetch(CONFIG.apiBase + '/data');
     if (res.ok) {
-      const remote = await res.json();
-      state.lists = remote.lists || [];
-      state.knownItems = remote.knownItems || [];
-    } else {
-      throw new Error('not ok');
-    }
+      const r = await res.json();
+      state.lists = r.lists || [];
+      state.knownItems = r.knownItems || [];
+      persistLocal();
+    } else throw new Error();
   } catch {
-    // Fallback to localStorage
-    const local = localStorage.getItem('ourshop_data');
-    if (local) {
-      const d = JSON.parse(local);
-      state.lists = d.lists || [];
-      state.knownItems = d.knownItems || [];
-    }
+    const local = localStorage.getItem('smithsons_data');
+    if (local) { const d = JSON.parse(local); state.lists = d.lists||[]; state.knownItems = d.knownItems||[]; }
   }
   renderLists();
 }
 
 async function saveData() {
-  const payload = { lists: state.lists, knownItems: state.knownItems };
-  localStorage.setItem('ourshop_data', JSON.stringify(payload));
+  persistLocal();
   try {
     await fetch(CONFIG.apiBase + '/data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ lists: state.lists, knownItems: state.knownItems }),
     });
-  } catch { /* silently fails — localStorage is the fallback */ }
+  } catch {}
 }
 
-// ══════════════════════════════════════════════
+function persistLocal() {
+  localStorage.setItem('smithsons_data', JSON.stringify({ lists: state.lists, knownItems: state.knownItems }));
+}
+
+// ══════════════════════════════════════════
 //  TABS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 function switchTab(tab) {
   state.currentTab = tab;
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && tab === 'active') || (i === 1 && tab === 'archived'));
-  });
-  document.getElementById('tab-active').style.display = tab === 'active' ? '' : 'none';
-  document.getElementById('tab-archived').style.display = tab === 'archived' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active', (i===0&&tab==='active')||(i===1&&tab==='archived'))
+  );
+  document.getElementById('tab-active').style.display   = tab==='active'   ? '' : 'none';
+  document.getElementById('tab-archived').style.display = tab==='archived' ? '' : 'none';
   renderLists();
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  LISTS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 function renderLists() {
-  const activeLists = state.lists.filter(l => !l.archived);
-  const archivedLists = state.lists.filter(l => l.archived);
-
-  renderListGrid('active-list-grid', activeLists, false);
-  renderListGrid('archived-list-grid', archivedLists, true);
+  renderListGrid('active-list-grid',   state.lists.filter(l=>!l.archived), false);
+  renderListGrid('archived-list-grid', state.lists.filter(l=> l.archived), true);
 }
 
-function renderListGrid(containerId, lists, isArchived) {
-  const el = document.getElementById(containerId);
+function renderListGrid(id, lists, isArchived) {
+  const el = document.getElementById(id);
   if (!lists.length) {
     el.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">${isArchived ? '📦' : '🛒'}</div>
-      <div class="empty-title">${isArchived ? 'Nothing archived yet' : 'No lists yet'}</div>
-      <div class="empty-desc">${isArchived ? 'Completed lists will appear here.' : 'Create a new shopping list to get started.'}</div>
-    </div>`;
-    return;
+      <div class="empty-icon">${isArchived?'📦':'🛒'}</div>
+      <div class="empty-title">${isArchived?'Nothing archived yet':'No lists yet'}</div>
+      <div class="empty-desc">${isArchived?'Completed lists will appear here.':'Create a new shopping list to get started.'}</div>
+    </div>`; return;
   }
-
   el.innerHTML = lists.map(list => {
     const total = list.items.length;
-    const done = list.items.filter(i => i.checked).length;
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    const date = new Date(list.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-
-    const actions = state.role === 'editor' ? `
-      <div class="card-actions">
-        ${!isArchived ? `<button class="btn btn-sage" onclick="event.stopPropagation();archiveList('${list.id}')">Archive</button>` : ''}
-        ${isArchived ? `<button class="btn btn-ghost" onclick="event.stopPropagation();restoreList('${list.id}')">Restore</button>` : ''}
-        <button class="btn btn-danger" onclick="event.stopPropagation();confirmDeleteList('${list.id}')">Delete</button>
-      </div>` : '';
-
-    return `<div class="list-card${isArchived ? ' archived' : ''}" onclick="openList('${list.id}')">
+    const done  = list.items.filter(i=>i.checked).length;
+    const pct   = total ? Math.round(done/total*100) : 0;
+    const date  = new Date(list.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    const actions = state.role==='editor' ? `<div class="card-actions">
+      ${!isArchived?`<button class="btn btn-sage" onclick="event.stopPropagation();archiveList('${list.id}')">Archive</button>`:''}
+      ${isArchived?`<button class="btn btn-ghost" onclick="event.stopPropagation();restoreList('${list.id}')">Restore</button>`:''}
+      <button class="btn btn-danger" onclick="event.stopPropagation();confirmDeleteList('${list.id}')">Delete</button>
+    </div>` : '';
+    return `<div class="list-card${isArchived?' archived':''}" onclick="openList('${list.id}')">
       <div class="list-card-header">
         <div class="list-card-title">${escHtml(list.name)}</div>
-        <span style="font-size:0.75rem;color:var(--ink-faint);white-space:nowrap;">${date}</span>
+        <span style="font-size:0.72rem;color:var(--ink-faint);white-space:nowrap;">${date}</span>
       </div>
       <div class="list-card-meta">
-        <span>${total} item${total !== 1 ? 's' : ''}</span>
-        <span>·</span>
+        <span>${total} item${total!==1?'s':''}</span><span>·</span>
         <span>${done} done</span>
-        ${pct === 100 && total > 0 ? '<span style="color:var(--sage);">✓ Complete</span>' : ''}
+        ${pct===100&&total>0?'<span style="color:var(--sage);font-weight:600;">✓ Complete</span>':''}
       </div>
-      ${total > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
+      ${total>0?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`:''}
       ${actions}
     </div>`;
   }).join('');
@@ -1080,183 +1099,167 @@ function openNewListForm() {
   document.getElementById('new-list-form').classList.add('open');
   document.getElementById('new-list-name').focus();
 }
-
 function closeNewListForm() {
   document.getElementById('new-list-form').classList.remove('open');
   document.getElementById('new-list-name').value = '';
 }
-
 async function createList() {
   const name = document.getElementById('new-list-name').value.trim();
   if (!name) return;
-  const newList = {
-    id: 'list_' + Date.now(),
-    name,
-    items: [],
-    archived: false,
-    createdAt: new Date().toISOString(),
-  };
+  const newList = { id:'list_'+Date.now(), name, items:[], archived:false, createdAt:new Date().toISOString() };
   state.lists.unshift(newList);
   await saveData();
   closeNewListForm();
   openList(newList.id);
 }
-
 async function archiveList(id) {
-  const list = state.lists.find(l => l.id === id);
-  if (list) { list.archived = true; await saveData(); renderLists(); toast('List archived'); }
+  const l=state.lists.find(l=>l.id===id); if(l){l.archived=true;await saveData();renderLists();toast('List archived');}
 }
-
 async function restoreList(id) {
-  const list = state.lists.find(l => l.id === id);
-  if (list) { list.archived = false; await saveData(); renderLists(); toast('List restored'); }
+  const l=state.lists.find(l=>l.id===id); if(l){l.archived=false;await saveData();renderLists();toast('List restored');}
 }
-
 function confirmDeleteList(id) {
-  const list = state.lists.find(l => l.id === id);
-  if (!list) return;
-  showConfirm(
-    'Delete "' + list.name + '"?',
-    'This will permanently remove the list and all its items.',
-    async () => {
-      state.lists = state.lists.filter(l => l.id !== id);
-      await saveData();
-      renderLists();
-      toast('List deleted');
-    }
-  );
+  const l=state.lists.find(l=>l.id===id); if(!l)return;
+  showConfirm(`Delete "${l.name}"?`,'This will permanently remove the list and all its items.', async()=>{
+    state.lists=state.lists.filter(l=>l.id!==id); await saveData(); renderLists(); toast('List deleted');
+  });
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  LIST VIEW
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 function openList(id) {
   state.currentListId = id;
   showScreen('list-view-screen');
   renderListView();
-
-  // Poll for updates every 15s if shopper
-  if (state.role === 'shopper') {
-    clearInterval(state.pollTimer);
-    state.pollTimer = setInterval(() => refreshList(), 15000);
-  }
+  clearInterval(state.pollTimer);
+  state.pollTimer = setInterval(refreshList, 15000);
 }
 
 async function refreshList() {
   try {
-    const res = await fetch(CONFIG.apiBase + '/data');
+    const res = await fetch(CONFIG.apiBase+'/data');
     if (res.ok) {
-      const remote = await res.json();
-      state.lists = remote.lists || [];
-      state.knownItems = remote.knownItems || [];
-      localStorage.setItem('ourshop_data', JSON.stringify({ lists: state.lists, knownItems: state.knownItems }));
+      const r = await res.json();
+      state.lists = r.lists||[];
+      state.knownItems = r.knownItems||[];
+      persistLocal();
       if (state.currentListId) renderListView();
     }
-  } catch { /* offline, no-op */ }
+  } catch {}
 }
 
 function renderListView() {
-  const list = state.lists.find(l => l.id === state.currentListId);
+  const list = state.lists.find(l=>l.id===state.currentListId);
   if (!list) return;
 
   document.getElementById('lv-title').textContent = list.name;
-
   const total = list.items.length;
-  const done = list.items.filter(i => i.checked).length;
-  const date = new Date(list.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('lv-meta').innerHTML = `
-    <span>${date}</span>
-    <span>·</span>
-    <span>${done} of ${total} done</span>
-  `;
+  const done  = list.items.filter(i=>i.checked).length;
+  const date  = new Date(list.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('lv-meta').innerHTML =
+    `<span>${date}</span><span>·</span><span>${done} of ${total} done</span>`;
 
-  // Completion banner
-  const banner = document.getElementById('completion-banner');
-  banner.style.display = (total > 0 && done === total) ? '' : 'none';
+  document.getElementById('completion-banner').style.display = (total>0&&done===total)?'':'none';
+  document.getElementById('add-item-box').style.display = (state.role==='editor'&&!list.archived)?'':'none';
 
-  // Add item box visibility
-  const addBox = document.getElementById('add-item-box');
-  addBox.style.display = (state.role === 'editor' && !list.archived) ? '' : 'none';
-
-  // Render items
   const section = document.getElementById('items-section');
-  const pending = list.items.filter(i => !i.checked);
-  const checked = list.items.filter(i => i.checked);
-
   if (!total) {
     section.innerHTML = `<div class="empty-state">
       <div class="empty-icon">📝</div>
       <div class="empty-title">List is empty</div>
-      <div class="empty-desc">${state.role === 'editor' ? 'Add items above to get started.' : 'No items added yet.'}</div>
-    </div>`;
-    return;
+      <div class="empty-desc">${state.role==='editor'?'Add items above to get started.':'No items added yet.'}</div>
+    </div>`; return;
   }
 
+  const pending = list.items.filter(i=>!i.checked);
+  const checked = list.items.filter(i=> i.checked);
   let html = '';
+
+  // Group pending by aisle
   if (pending.length) {
-    pending.forEach(item => { html += itemRowHtml(item, list.archived); });
+    const groups = {};
+    pending.forEach(item => {
+      const a = item.aisle || 'General';
+      if (!groups[a]) groups[a] = [];
+      groups[a].push(item);
+    });
+    const sorted = Object.keys(groups).sort((a,b)=>{
+      const ai=AISLE_ORDER.indexOf(a), bi=AISLE_ORDER.indexOf(b);
+      return (ai===-1?99:ai)-(bi===-1?99:bi);
+    });
+    sorted.forEach(aisle => {
+      html += `<div class="aisle-group">
+        <div class="aisle-label">${escHtml(aisle)}</div>
+        <div class="aisle-items">${groups[aisle].map(i=>itemRowHtml(i,list.archived)).join('')}</div>
+      </div>`;
+    });
   }
+
+  // Checked items flat
   if (checked.length) {
-    html += `<div class="items-group-label">Checked off (${checked.length})</div>`;
-    checked.forEach(item => { html += itemRowHtml(item, list.archived); });
+    html += `<div class="checked-group-label">In the trolley (${checked.length})</div>`;
+    html += checked.map(i=>itemRowHtml(i,list.archived)).join('');
   }
+
   section.innerHTML = html;
 }
 
 function itemRowHtml(item, archived) {
-  const canDelete = state.role === 'editor' && !archived;
-  const deleteBtn = canDelete
+  const canDelete = state.role==='editor' && !archived;
+  const delBtn = canDelete
     ? `<button class="item-delete" onclick="event.stopPropagation();removeItem('${item.id}')" title="Remove">✕</button>`
     : '';
-  return `<div class="item-row${item.checked ? ' checked' : ''}" onclick="toggleItem('${item.id}')">
-    <div class="check-circle">${item.checked ? '✓' : ''}</div>
-    <div class="item-info">
-      <div class="item-name">${escHtml(item.name)}</div>
-      ${item.qty ? `<div class="item-qty">${escHtml(item.qty)}</div>` : ''}
+  // Show qty badge only if not "1"
+  const qty = item.qty && item.qty !== '1'
+    ? `<span class="item-qty-badge">${escHtml(item.qty)}</span>` : '';
+  return `<div class="item-row${item.checked?' checked':''}" onclick="toggleItem('${item.id}')">
+    <div class="check-circle">${item.checked?'✓':''}</div>
+    <div class="item-inline">
+      <span class="item-name">${escHtml(item.name)}</span>${qty}
     </div>
-    ${deleteBtn}
+    ${delBtn}
   </div>`;
 }
 
 async function toggleItem(itemId) {
-  const list = state.lists.find(l => l.id === state.currentListId);
-  if (!list) return;
-  const item = list.items.find(i => i.id === itemId);
-  if (!item) return;
-  item.checked = !item.checked;
-  await saveData();
-  renderListView();
+  const list=state.lists.find(l=>l.id===state.currentListId); if(!list)return;
+  const item=list.items.find(i=>i.id===itemId); if(!item)return;
+  item.checked=!item.checked;
+  await saveData(); renderListView();
 }
-
 async function removeItem(itemId) {
-  const list = state.lists.find(l => l.id === state.currentListId);
-  if (!list) return;
-  list.items = list.items.filter(i => i.id !== itemId);
-  await saveData();
-  renderListView();
+  const list=state.lists.find(l=>l.id===state.currentListId); if(!list)return;
+  list.items=list.items.filter(i=>i.id!==itemId);
+  await saveData(); renderListView();
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  ADD ITEM + SUGGESTIONS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 let selectedSuggestion = -1;
+
+function itemName(k) { return typeof k==='object'?k.name:k; }
+function itemAisle(k) { return typeof k==='object'?k.aisle:'General'; }
 
 function onItemInput() {
   const val = document.getElementById('item-input').value.trim();
   if (!val) { hideSuggestions(); return; }
   const matches = state.knownItems
-    .filter(k => k.toLowerCase().includes(val.toLowerCase()) && k.toLowerCase() !== val.toLowerCase())
+    .filter(k => itemName(k).toLowerCase().includes(val.toLowerCase()) && itemName(k).toLowerCase()!==val.toLowerCase())
     .slice(0, 8);
-  renderSuggestions(matches, val);
+  renderSuggestions(matches);
 }
 
-function renderSuggestions(items, query) {
+function renderSuggestions(items) {
   const box = document.getElementById('suggestions-box');
   if (!items.length) { hideSuggestions(); return; }
   selectedSuggestion = -1;
-  box.innerHTML = items.map((item, i) =>
-    `<div class="suggestion-item" onmousedown="pickSuggestion('${escAttr(item)}')" data-idx="${i}">
-      <span class="sug-icon">⌘</span>${escHtml(item)}
+  box.innerHTML = items.map((k,i) =>
+    `<div class="suggestion-item" onmousedown="pickSuggestion('${escAttr(itemName(k))}','${escAttr(itemAisle(k))}')" data-idx="${i}">
+      <span class="sug-icon">⌘</span>
+      <span>${escHtml(itemName(k))}</span>
+      <span style="margin-left:auto;font-size:0.72rem;color:var(--ink-faint);">${escHtml(itemAisle(k))}</span>
     </div>`
   ).join('');
   box.classList.add('open');
@@ -1267,127 +1270,103 @@ function hideSuggestions() {
   selectedSuggestion = -1;
 }
 
-function pickSuggestion(name) {
+function pickSuggestion(name, aisle) {
   document.getElementById('item-input').value = name;
+  const sel = document.getElementById('aisle-input');
+  for (const opt of sel.options) { if (opt.value===aisle){sel.value=aisle;break;} }
   hideSuggestions();
   document.getElementById('qty-input').focus();
 }
 
 function onItemKeydown(e) {
-  const box = document.getElementById('suggestions-box');
-  const items = box.querySelectorAll('.suggestion-item');
-  if (e.key === 'ArrowDown') {
+  const items = document.getElementById('suggestions-box').querySelectorAll('.suggestion-item');
+  if (e.key==='ArrowDown') {
     e.preventDefault();
-    selectedSuggestion = Math.min(selectedSuggestion + 1, items.length - 1);
-    highlightSuggestion(items);
-  } else if (e.key === 'ArrowUp') {
+    selectedSuggestion=Math.min(selectedSuggestion+1,items.length-1);
+    items.forEach((el,i)=>el.style.background=i===selectedSuggestion?'var(--paper2)':'');
+  } else if (e.key==='ArrowUp') {
     e.preventDefault();
-    selectedSuggestion = Math.max(selectedSuggestion - 1, -1);
-    highlightSuggestion(items);
-  } else if (e.key === 'Enter') {
-    if (selectedSuggestion >= 0 && items[selectedSuggestion]) {
-      pickSuggestion(items[selectedSuggestion].textContent.trim());
-    } else {
-      addItem();
-    }
-  } else if (e.key === 'Escape') {
-    hideSuggestions();
-  }
-}
-
-function highlightSuggestion(items) {
-  items.forEach((el, i) => el.style.background = i === selectedSuggestion ? 'var(--cream)' : '');
+    selectedSuggestion=Math.max(selectedSuggestion-1,-1);
+    items.forEach((el,i)=>el.style.background=i===selectedSuggestion?'var(--paper2)':'');
+  } else if (e.key==='Enter') {
+    if (selectedSuggestion>=0&&items[selectedSuggestion]) {
+      const spans=items[selectedSuggestion].querySelectorAll('span');
+      pickSuggestion(spans[1].textContent, spans[2].textContent);
+    } else { addItem(); }
+  } else if (e.key==='Escape') { hideSuggestions(); }
 }
 
 async function addItem() {
-  const nameInput = document.getElementById('item-input');
-  const qtyInput = document.getElementById('qty-input');
-  const name = nameInput.value.trim();
-  const qty = qtyInput.value.trim();
+  const nameIn  = document.getElementById('item-input');
+  const qtyIn   = document.getElementById('qty-input');
+  const aisleIn = document.getElementById('aisle-input');
+  const name  = nameIn.value.trim();
+  const qty   = qtyIn.value.trim() || '1';
+  const aisle = aisleIn.value || 'General';
 
-  if (!name) { nameInput.focus(); return; }
+  if (!name) { nameIn.focus(); return; }
 
-  const list = state.lists.find(l => l.id === state.currentListId);
+  const list = state.lists.find(l=>l.id===state.currentListId);
   if (!list) return;
 
-  const newItem = {
-    id: 'item_' + Date.now(),
-    name,
-    qty: qty || '',
-    checked: false,
-    addedAt: new Date().toISOString(),
-  };
+  list.items.push({ id:'item_'+Date.now(), name, qty, aisle, checked:false, addedAt:new Date().toISOString() });
 
-  list.items.push(newItem);
-
-  // Learn item
-  if (!state.knownItems.some(k => k.toLowerCase() === name.toLowerCase())) {
-    state.knownItems.push(name);
-    // Keep sorted, max 500
-    state.knownItems.sort((a, b) => a.localeCompare(b));
-    if (state.knownItems.length > 500) state.knownItems.shift();
+  // Learn / update item
+  const idx = state.knownItems.findIndex(k=>itemName(k).toLowerCase()===name.toLowerCase());
+  if (idx>=0) { state.knownItems[idx]={name,aisle}; }
+  else {
+    state.knownItems.push({name,aisle});
+    state.knownItems.sort((a,b)=>itemName(a).localeCompare(itemName(b)));
+    if (state.knownItems.length>500) state.knownItems.shift();
   }
 
-  nameInput.value = '';
-  qtyInput.value = '';
-  hideSuggestions();
-  nameInput.focus();
-
-  await saveData();
-  renderListView();
+  nameIn.value=''; qtyIn.value='1';
+  hideSuggestions(); nameIn.focus();
+  await saveData(); renderListView();
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  MODAL
-// ══════════════════════════════════════════════
-let confirmCallback = null;
-
+// ══════════════════════════════════════════
 function showConfirm(title, body, onOk) {
   document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-body').textContent = body;
+  document.getElementById('confirm-body').textContent  = body;
   document.getElementById('confirm-modal').classList.add('open');
-  confirmCallback = onOk;
-  document.getElementById('confirm-ok').onclick = () => { closeModal(); onOk(); };
+  document.getElementById('confirm-ok').onclick = ()=>{ closeModal(); onOk(); };
 }
+function closeModal() { document.getElementById('confirm-modal').classList.remove('open'); }
 
-function closeModal() {
-  document.getElementById('confirm-modal').classList.remove('open');
-}
-
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  TOAST
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent=msg; el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  UTILS
-// ══════════════════════════════════════════════
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) { return String(s).replace(/'/g, "\\'"); }
+// ══════════════════════════════════════════
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escAttr(s){return String(s).replace(/'/g,"\\'");}
 
-// Click outside suggestions to close
-document.addEventListener('click', (e) => {
-  if (!document.getElementById('add-item-box')?.contains(e.target)) hideSuggestions();
+document.addEventListener('click',e=>{
+  if(!document.getElementById('add-item-box')?.contains(e.target))hideSuggestions();
+});
+document.getElementById('confirm-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('confirm-modal'))closeModal();
 });
 
-// Close modal on overlay click
-document.getElementById('confirm-modal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('confirm-modal')) closeModal();
-});
-
-// Restore session on reload
-window.addEventListener('load', () => {
-  const savedRole = sessionStorage.getItem('role');
-  if (savedRole) login(savedRole);
+// ══════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════
+window.addEventListener('load', async()=>{
+  await loadPins();
+  const saved = sessionStorage.getItem('role');
+  if (saved && state.pins) login(saved);
 });
 </script>
 </body>
