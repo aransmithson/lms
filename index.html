@@ -575,20 +575,18 @@
   }
   .item-row.checked .item-qty-badge { opacity: 0.6; }
   .item-delete {
-    background: none;
+    background: var(--rose-light);
     border: none;
-    color: var(--ink-faint);
+    color: var(--rose);
     cursor: pointer;
-    padding: 0.25rem;
+    padding: 0.35rem 0.5rem;
     border-radius: 6px;
     font-size: 0.78rem;
     line-height: 1;
     transition: all 0.15s;
-    opacity: 0;
     flex-shrink: 0;
   }
-  .item-row:hover .item-delete { opacity: 1; }
-  .item-delete:hover { background: var(--rose-light); color: var(--rose); }
+  .item-delete:hover { background: var(--rose); color: white; }
 
   /* ---- CHECKED GROUP ---- */
   .checked-group-label {
@@ -1294,7 +1292,8 @@ function renderListView() {
 }
 
 function itemRowHtml(item, archived) {
-  const canDelete = state.role==='editor' && !archived;
+  const isEditor = state.role==='editor';
+  const canDelete = isEditor && !archived;
   const delBtn = canDelete
     ? `<button class="item-delete" onclick="event.stopPropagation();removeItem('${item.id}')" title="Remove">&#10005;</button>`
     : '';
@@ -1313,12 +1312,23 @@ function itemRowHtml(item, archived) {
     </div>`;
   }
 
+  // Editor: no check interaction, just view + delete
+  if (isEditor) {
+    return `<div class="item-row${item.checked?' checked':''}">
+      <div class="check-circle">${item.checked?'&#10003;':''}</div>
+      <div class="item-inline">
+        <span class="item-name">${escHtml(item.name)}</span>${qty}
+      </div>
+      ${delBtn}
+    </div>`;
+  }
+
+  // Shopper: clickable to toggle checked
   return `<div class="item-row${item.checked?' checked':''}" onclick="toggleItem('${item.id}')">
     <div class="check-circle">${item.checked?'&#10003;':''}</div>
     <div class="item-inline">
       <span class="item-name">${escHtml(item.name)}</span>${qty}
     </div>
-    ${delBtn}
   </div>`;
 }
 
