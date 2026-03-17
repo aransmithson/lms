@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ââ LIGHT THEME ââ */
+  /* ---- LIGHT THEME ---- */
   :root {
     --cream: #F5F0E8;
     --paper: #FAF7F2;
@@ -29,7 +29,7 @@
     --toggle-knob: white;
   }
 
-  /* ââ DARK THEME ââ */
+  /* ---- DARK THEME ---- */
   [data-theme="dark"] {
     --cream: #151310;
     --paper: #1E1B17;
@@ -70,7 +70,7 @@
     z-index: 9999;
   }
 
-  /* ââ DARK MODE TOGGLE ââ */
+  /* ---- DARK MODE TOGGLE ---- */
   .dark-toggle {
     display: flex;
     align-items: center;
@@ -101,11 +101,11 @@
   [data-theme="dark"] .dark-toggle-knob { transform: translateX(15px); }
   .dark-toggle-icon { font-size: 0.8rem; line-height: 1; }
 
-  /* ââ SCREENS ââ */
+  /* ---- SCREENS ---- */
   .screen { display: none; min-height: 100vh; }
   .screen.active { display: flex; flex-direction: column; }
 
-  /* ââ LOGIN ââ */
+  /* ---- LOGIN ---- */
   #login-screen {
     align-items: center;
     justify-content: center;
@@ -215,7 +215,7 @@
     min-height: 1.2em;
   }
 
-  /* ââ APP HEADER ââ */
+  /* ---- APP HEADER ---- */
   .app-header {
     background: var(--paper);
     border-bottom: 1px solid var(--border);
@@ -255,7 +255,7 @@
   }
   .btn-icon:hover { border-color: var(--ink); color: var(--ink); }
 
-  /* ââ TABS ââ */
+  /* ---- TABS ---- */
   .tab-bar {
     background: var(--paper);
     border-bottom: 1px solid var(--border);
@@ -277,7 +277,7 @@
   }
   .tab.active { color: var(--ink); border-bottom-color: var(--sage); }
 
-  /* ââ MAIN CONTENT ââ */
+  /* ---- MAIN CONTENT ---- */
   .app-content {
     flex: 1;
     padding: 1.5rem;
@@ -286,7 +286,7 @@
     margin: 0 auto;
   }
 
-  /* ââ SECTION HEADER ââ */
+  /* ---- SECTION HEADER ---- */
   .section-header {
     display: flex;
     align-items: center;
@@ -295,7 +295,7 @@
   }
   .section-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
 
-  /* ââ BUTTONS ââ */
+  /* ---- BUTTONS ---- */
   .btn {
     border: none;
     border-radius: 10px;
@@ -319,7 +319,7 @@
   .btn-sage { background: var(--sage-light); color: var(--sage); }
   .btn-sage:hover { background: var(--sage); color: white; }
 
-  /* ââ LIST CARDS ââ */
+  /* ---- LIST CARDS ---- */
   .list-grid { display: flex; flex-direction: column; gap: 1rem; }
   .list-card {
     background: var(--paper);
@@ -349,7 +349,7 @@
   .progress-fill { height: 100%; background: var(--sage); border-radius: 4px; transition: width 0.4s ease; }
   .card-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.65rem; border-top: 1px solid var(--border); }
 
-  /* ââ NEW LIST FORM ââ */
+  /* ---- NEW LIST FORM ---- */
   .new-list-form {
     background: var(--paper);
     border-radius: var(--radius);
@@ -384,13 +384,13 @@
   .field input::placeholder { color: var(--ink-faint); }
   .field input:focus { border-color: var(--sage); }
 
-  /* ââ LIST VIEW ââ */
+  /* ---- LIST VIEW ---- */
   #list-view-screen .app-content { padding-bottom: 5rem; }
   .list-view-header { margin-bottom: 1.4rem; }
   .list-view-title { font-family: 'DM Serif Display', serif; font-size: 1.9rem; line-height: 1.15; margin-bottom: 0.3rem; }
   .list-view-meta { color: var(--ink-light); font-size: 0.82rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
 
-  /* ââ ADD ITEM BOX ââ */
+  /* ---- ADD ITEM BOX ---- */
   .add-item-box {
     background: var(--paper);
     border-radius: var(--radius);
@@ -497,7 +497,7 @@
   .suggestion-item:hover { background: var(--paper2); }
   .sug-icon { color: var(--ink-faint); font-size: 0.75rem; }
 
-  /* ââ AISLE GROUPING ââ */
+  /* ---- AISLE GROUPING ---- */
   .aisle-group { margin-bottom: 1.1rem; }
   .aisle-label {
     font-size: 0.68rem;
@@ -514,7 +514,7 @@
   .aisle-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   .aisle-items { display: flex; flex-direction: column; gap: 0.4rem; }
 
-  /* ââ ITEM ROWS ââ */
+  /* ---- ITEM ROWS ---- */
   .item-row {
     background: var(--paper);
     border-radius: 10px;
@@ -590,7 +590,7 @@
   .item-row:hover .item-delete { opacity: 1; }
   .item-delete:hover { background: var(--rose-light); color: var(--rose); }
 
-  /* ââ CHECKED GROUP ââ */
+  /* ---- CHECKED GROUP ---- */
   .checked-group-label {
     font-size: 0.68rem;
     letter-spacing: 0.13em;
@@ -605,13 +605,13 @@
   }
   .checked-group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* ââ EMPTY STATES ââ */
+  /* ---- EMPTY STATES ---- */
   .empty-state { text-align: center; padding: 3rem 2rem; color: var(--ink-light); }
   .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
   .empty-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--ink); margin-bottom: 0.35rem; }
   .empty-desc { font-size: 0.83rem; line-height: 1.6; }
 
-  /* ââ MODAL ââ */
+  /* ---- MODAL ---- */
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.5);
@@ -640,7 +640,7 @@
   .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.35rem; margin-bottom: 1rem; }
   .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.4rem; }
 
-  /* ââ COMPLETION BANNER ââ */
+  /* ---- COMPLETION BANNER ---- */
   .completion-banner {
     background: var(--sage-light);
     border: 1px solid rgba(92,122,95,0.2);
@@ -655,7 +655,7 @@
   .completion-text .big { font-family: 'DM Serif Display', serif; font-size: 1rem; }
   .completion-text .small { font-size: 0.78rem; color: var(--sage); margin-top: 0.1rem; }
 
-  /* ââ TOAST ââ */
+  /* ---- TOAST ---- */
   .toast {
     position: fixed;
     bottom: 2rem; left: 50%;
@@ -671,7 +671,7 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ââ SKIPPED ITEM (not collected) ââ */
+  /* ---- SKIPPED ITEM (not collected) ---- */
   .item-row.skipped {
     border-color: rgba(212,129,58,0.35);
     background: var(--amber-light);
@@ -684,14 +684,14 @@
   }
   .item-row.skipped .item-name { color: var(--ink); }
 
-  /* ââ PARTIAL COMPLETION BANNER ââ */
+  /* ---- PARTIAL COMPLETION BANNER ---- */
   .completion-banner.partial {
     background: var(--amber-light);
     border-color: rgba(212,129,58,0.25);
   }
   .completion-banner.partial .completion-text .small { color: var(--amber); }
 
-  /* ââ FINISH SHOP BAR (shopper) ââ */
+  /* ---- FINISH SHOP BAR (shopper) ---- */
   .finish-shop-bar {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -709,7 +709,7 @@
   .btn-amber { background: var(--amber); color: white; }
   .btn-amber:hover { background: var(--ink); }
 
-  /* ââ RESPONSIVE ââ */
+  /* ---- RESPONSIVE ---- */
   @media (max-width: 520px) {
     .app-content { padding: 1rem; }
     .app-header { padding: 0.75rem 1rem; }
@@ -718,13 +718,12 @@
     .add-item-row { flex-wrap: wrap; }
     .ai-field-aisle { width: 100%; }
     .ai-field-qty { width: 70px; }
-    .btn-add-item { width: 100%; justify-content: center; }
-  }
+    }
 </style>
 </head>
 <body>
 
-<!-- ââââââââââââââ LOGIN ââââââââââââââ -->
+<!-- ---------------------------- LOGIN ---------------------------- -->
 <div id="login-screen" class="screen active">
   <div class="login-card">
     <div class="login-logo">Smithson<span>'s</span></div>
@@ -755,15 +754,15 @@
   </div>
 </div>
 
-<!-- ââââââââââââââ MAIN APP ââââââââââââââ -->
+<!-- ---------------------------- MAIN APP ---------------------------- -->
 <div id="app-screen" class="screen">
   <div class="app-header">
     <div class="app-logo">Smithson<span>'s</span></div>
     <div class="header-right">
       <div class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">
-        <span class="dark-toggle-icon">âï¸</span>
+        <span class="dark-toggle-icon">&#9728;&#65039;</span>
         <div class="dark-toggle-track"><div class="dark-toggle-knob"></div></div>
-        <span class="dark-toggle-icon">ð</span>
+        <span class="dark-toggle-icon">&#127769;</span>
       </div>
       <span class="role-badge" id="role-badge">Editor</span>
       <button class="btn-icon" onclick="logout()">Lock</button>
@@ -778,7 +777,7 @@
       <div class="form-row" style="margin-bottom:0.75rem;">
         <div class="field">
           <label>List Name</label>
-          <input type="text" id="new-list-name" placeholder="e.g. Weekly Shop, Tesco Runâ¦" onkeydown="if(event.key==='Enter')createList()">
+          <input type="text" id="new-list-name" placeholder="e.g. Weekly Shop, Tesco Run&hellip;" onkeydown="if(event.key==='Enter')createList()">
         </div>
       </div>
       <div class="form-row">
@@ -802,15 +801,15 @@
   </div>
 </div>
 
-<!-- ââââââââââââââ LIST VIEW ââââââââââââââ -->
+<!-- ---------------------------- LIST VIEW ---------------------------- -->
 <div id="list-view-screen" class="screen">
   <div class="app-header">
-    <button class="btn-icon" onclick="goBack()">â Back</button>
+    <button class="btn-icon" onclick="goBack()">&larr; Back</button>
     <div class="header-right">
       <div class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">
-        <span class="dark-toggle-icon">âï¸</span>
+        <span class="dark-toggle-icon">&#9728;&#65039;</span>
         <div class="dark-toggle-track"><div class="dark-toggle-knob"></div></div>
-        <span class="dark-toggle-icon">ð</span>
+        <span class="dark-toggle-icon">&#127769;</span>
       </div>
       <span class="role-badge" id="lv-role-badge">Editor</span>
       <button class="btn-icon" onclick="logout()">Lock</button>
@@ -822,7 +821,7 @@
       <div class="list-view-meta" id="lv-meta"></div>
     </div>
     <div class="completion-banner" id="completion-banner" style="display:none;">
-      <div class="completion-icon">ð</div>
+      <div class="completion-icon">&#127881;</div>
       <div class="completion-text">
         <div class="big">Shopping done!</div>
         <div class="small">All items ticked off</div>
@@ -833,7 +832,7 @@
       <div class="add-item-row">
         <div class="ai-field ai-field-item">
           <span class="ai-label">Item</span>
-          <input class="ai-input" type="text" id="item-input" placeholder="Type item nameâ¦" autocomplete="off"
+          <input class="ai-input" type="text" id="item-input" placeholder="Type item name&hellip;" autocomplete="off"
             oninput="onItemInput()" onkeydown="onItemKeydown(event)" onfocus="onItemInput()">
         </div>
         <div class="ai-field ai-field-qty">
@@ -869,7 +868,7 @@
   </div>
 </div>
 
-<!-- ââââââââââââââ CONFIRM MODAL ââââââââââââââ -->
+<!-- ---------------------------- CONFIRM MODAL ---------------------------- -->
 <div class="modal-overlay" id="confirm-modal">
   <div class="modal">
     <div class="modal-title" id="confirm-title">Confirm</div>
@@ -881,7 +880,7 @@
   </div>
 </div>
 
-<!-- ââââââââââââââ FINISH SHOP BAR ââââââââââââââ -->
+<!-- ---------------------------- FINISH SHOP BAR ---------------------------- -->
 <div class="finish-shop-bar" id="finish-shop-bar" style="display:none;">
   <span class="finish-shop-bar-text" id="finish-shop-bar-text"></span>
   <button class="btn btn-amber" onclick="confirmCompleteEarly()">Finish Shop</button>
@@ -890,9 +889,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  CONFIG
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 const CONFIG = { apiBase: '/api' };
 
 const AISLE_ORDER = [
@@ -901,9 +900,9 @@ const AISLE_ORDER = [
   'Cleaning','Toiletries','Baby','Pet','General','Other'
 ];
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  STATE
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 let state = {
   role: null,
   lists: [],
@@ -914,9 +913,9 @@ let state = {
   pollTimer: null,
 };
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  DARK MODE
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   localStorage.setItem('smithsons_theme', dark ? 'dark' : 'light');
@@ -929,9 +928,9 @@ function toggleDark() {
   if (localStorage.getItem('smithsons_theme') === 'dark') applyTheme(true);
 })();
 
-// ââââââââââââââââââââââââââââââââââââââââââ
-//  PIN SYSTEM â fetched from KV via /api/pins
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
+//  PIN SYSTEM &mdash; fetched from KV via /api/pins
+// ------------------------------------------------------------------------------------
 
 // Fallback PINs used when KV is unreachable (e.g. KV not yet bound).
 // Change these to match what you set in KV.
@@ -956,9 +955,9 @@ async function loadPins() {
     }
     throw new Error('bad response');
   } catch {
-    // KV not set up yet, network error, or bad response â use fallback silently
+    // KV not set up yet, network error, or bad response &mdash; use fallback silently
     state.pins = FALLBACK_PINS;
-    setLoginMsg('â ï¸ Using default PINs â KV not connected');
+    setLoginMsg('&#9888;&#65039; Using default PINs &mdash; KV not connected');
     setTimeout(() => setLoginMsg(''), 4000);
   }
 }
@@ -966,8 +965,8 @@ async function loadPins() {
 function setLoginMsg(msg, isError) {
   const errEl = document.getElementById('login-error');
   const ldEl  = document.getElementById('login-loading');
-  if (isError) { errEl.textContent = msg; ldEl.textContent = ''; }
-  else         { ldEl.textContent = msg;  errEl.textContent = ''; }
+  if (isError) { errEl.innerHTML = msg; ldEl.innerHTML = ''; }
+  else         { ldEl.innerHTML = msg;  errEl.innerHTML = ''; }
 }
 
 function pinPress(d) {
@@ -1025,9 +1024,9 @@ function logout() {
   showScreen('login-screen');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  SCREENS
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1042,9 +1041,9 @@ function goBack() {
   renderLists();
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  DATA
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 async function loadData() {
   try {
     const res = await fetch(CONFIG.apiBase + '/data');
@@ -1076,9 +1075,9 @@ function persistLocal() {
   localStorage.setItem('smithsons_data', JSON.stringify({ lists: state.lists, knownItems: state.knownItems }));
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  TABS
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function switchTab(tab) {
   state.currentTab = tab;
   document.querySelectorAll('.tab').forEach((t,i) =>
@@ -1089,9 +1088,9 @@ function switchTab(tab) {
   renderLists();
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  LISTS
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function renderLists() {
   renderListGrid('active-list-grid',   state.lists.filter(l=>!l.archived), false);
   renderListGrid('archived-list-grid', state.lists.filter(l=> l.archived), true);
@@ -1101,7 +1100,7 @@ function renderListGrid(id, lists, isArchived) {
   const el = document.getElementById(id);
   if (!lists.length) {
     el.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">${isArchived?'ð¦':'ð'}</div>
+      <div class="empty-icon">${isArchived?'&#128230;':'&#128722;'}</div>
       <div class="empty-title">${isArchived?'Nothing archived yet':'No lists yet'}</div>
       <div class="empty-desc">${isArchived?'Completed lists will appear here.':'Create a new shopping list to get started.'}</div>
     </div>`; return;
@@ -1122,12 +1121,12 @@ function renderListGrid(id, lists, isArchived) {
         <span style="font-size:0.72rem;color:var(--ink-faint);white-space:nowrap;">${date}</span>
       </div>
       <div class="list-card-meta">
-        <span>${total} item${total!==1?'s':''}</span><span>Â·</span>
+        <span>${total} item${total!==1?'s':''}</span><span>&middot;</span>
         <span>${done} done</span>
         ${(()=>{
           const sk=list.items.filter(i=>i.skipped).length;
-          if(sk) return `<span>Â·</span><span style="color:var(--amber);font-weight:600;">â ï¸ ${sk} not collected</span>`;
-          if(pct===100&&total>0) return `<span>Â·</span><span style="color:var(--sage);font-weight:600;">â Complete</span>`;
+          if(sk) return `<span>&middot;</span><span style="color:var(--amber);font-weight:600;">&#9888;&#65039; ${sk} not collected</span>`;
+          if(pct===100&&total>0) return `<span>&middot;</span><span style="color:var(--sage);font-weight:600;">&#10003; Complete</span>`;
           return '';
         })()}
       </div>
@@ -1167,9 +1166,9 @@ function confirmDeleteList(id) {
   });
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  LIST VIEW
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function openList(id) {
   state.currentListId = id;
   showScreen('list-view-screen');
@@ -1202,24 +1201,24 @@ function renderListView() {
   const date    = new Date(list.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
   let metaExtra = '';
-  if (list.shopDone && skipped.length) metaExtra = `<span style="color:var(--amber);font-weight:600;">â ï¸ ${skipped.length} not collected</span>`;
-  else if (list.shopDone)               metaExtra = `<span style="color:var(--sage);font-weight:600;">â Shop done</span>`;
+  if (list.shopDone && skipped.length) metaExtra = `<span style="color:var(--amber);font-weight:600;">&#9888;&#65039; ${skipped.length} not collected</span>`;
+  else if (list.shopDone)               metaExtra = `<span style="color:var(--sage);font-weight:600;">&#10003; Shop done</span>`;
   document.getElementById('lv-meta').innerHTML =
-    `<span>${date}</span><span>Â·</span><span>${done} of ${total} done</span>${metaExtra?'<span>Â·</span>'+metaExtra:''}`;
+    `<span>${date}</span><span>&middot;</span><span>${done} of ${total} done</span>${metaExtra?'<span>&middot;</span>'+metaExtra:''}`;
 
   // Completion / partial banner
   const banner = document.getElementById('completion-banner');
   if (list.shopDone && skipped.length) {
     banner.className = 'completion-banner partial';
     banner.style.display = '';
-    banner.querySelector('.completion-icon').textContent = 'â ï¸';
+    banner.querySelector('.completion-icon').innerHTML = '&#9888;&#65039;';
     banner.querySelector('.big').textContent = 'Shop completed';
     banner.querySelector('.small').textContent =
-      `${skipped.length} item${skipped.length!==1?'s':''} not collected â flagged for review`;
+      `${skipped.length} item${skipped.length!==1?'s':''} not collected &mdash; flagged for review`;
   } else if (total > 0 && done === total && !skipped.length) {
     banner.className = 'completion-banner';
     banner.style.display = '';
-    banner.querySelector('.completion-icon').textContent = 'ð';
+    banner.querySelector('.completion-icon').innerHTML = '&#127881;';
     banner.querySelector('.big').textContent = 'Shopping done!';
     banner.querySelector('.small').textContent = 'All items ticked off';
   } else {
@@ -1244,7 +1243,7 @@ function renderListView() {
   const section = document.getElementById('items-section');
   if (!total) {
     section.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">ð</div>
+      <div class="empty-icon">&#128221;</div>
       <div class="empty-title">List is empty</div>
       <div class="empty-desc">${state.role==='editor'?'Add items above to get started.':'No items added yet.'}</div>
     </div>`; return;
@@ -1273,9 +1272,9 @@ function renderListView() {
     });
   }
 
-  // Skipped items â shown to editor as warnings
+  // Skipped items &mdash; shown to editor as warnings
   if (skipped.length) {
-    html += `<div class="checked-group-label" style="color:var(--amber);">â ï¸ Not collected (${skipped.length})</div>`;
+    html += `<div class="checked-group-label" style="color:var(--amber);">&#9888;&#65039; Not collected (${skipped.length})</div>`;
     html += skipped.map(i=>itemRowHtml(i,list.archived)).join('');
   }
 
@@ -1291,16 +1290,16 @@ function renderListView() {
 function itemRowHtml(item, archived) {
   const canDelete = state.role==='editor' && !archived;
   const delBtn = canDelete
-    ? `<button class="item-delete" onclick="event.stopPropagation();removeItem('${item.id}')" title="Remove">â</button>`
+    ? `<button class="item-delete" onclick="event.stopPropagation();removeItem('${item.id}')" title="Remove">&#10005;</button>`
     : '';
   // Show qty badge only if not "1"
   const qty = item.qty && item.qty !== '1'
     ? `<span class="item-qty-badge">${escHtml(item.qty)}</span>` : '';
 
-  // Skipped (not collected) â amber warning row, non-interactive
+  // Skipped (not collected) &mdash; amber warning row, non-interactive
   if (item.skipped) {
     return `<div class="item-row skipped">
-      <div class="check-circle">â ï¸</div>
+      <div class="check-circle">&#9888;&#65039;</div>
       <div class="item-inline">
         <span class="item-name">${escHtml(item.name)}</span>${qty}
       </div>
@@ -1309,7 +1308,7 @@ function itemRowHtml(item, archived) {
   }
 
   return `<div class="item-row${item.checked?' checked':''}" onclick="toggleItem('${item.id}')">
-    <div class="check-circle">${item.checked?'â':''}</div>
+    <div class="check-circle">${item.checked?'&#10003;':''}</div>
     <div class="item-inline">
       <span class="item-name">${escHtml(item.name)}</span>${qty}
     </div>
@@ -1338,7 +1337,7 @@ function confirmCompleteEarly() {
       list.shopDoneAt = new Date().toISOString();
       await saveData();
       renderListView();
-      toast(`Shop done â ${remaining.length} item${remaining.length!==1?'s':''} flagged`);
+      toast(`Shop done &mdash; ${remaining.length} item${remaining.length!==1?'s':''} flagged`);
     }
   );
 }
@@ -1348,9 +1347,9 @@ async function removeItem(itemId) {
   await saveData(); renderListView();
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  ADD ITEM + SUGGESTIONS
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 let selectedSuggestion = -1;
 
 function itemName(k) { return typeof k==='object'?k.name:k; }
@@ -1371,7 +1370,7 @@ function renderSuggestions(items) {
   selectedSuggestion = -1;
   box.innerHTML = items.map((k,i) =>
     `<div class="suggestion-item" onmousedown="pickSuggestion('${escAttr(itemName(k))}','${escAttr(itemAisle(k))}')" data-idx="${i}">
-      <span class="sug-icon">â</span>
+      <span class="sug-icon">&#8599;</span>
       <span>${escHtml(itemName(k))}</span>
       <span style="margin-left:auto;font-size:0.72rem;color:var(--ink-faint);">${escHtml(itemAisle(k))}</span>
     </div>`
@@ -1439,9 +1438,9 @@ async function addItem() {
   await saveData(); renderListView();
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  MODAL
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function showConfirm(title, body, onOk) {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-body').textContent  = body;
@@ -1450,20 +1449,20 @@ function showConfirm(title, body, onOk) {
 }
 function closeModal() { document.getElementById('confirm-modal').classList.remove('open'); }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  TOAST
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
+  el.innerHTML=msg; el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  UTILS
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escAttr(s){return String(s).replace(/'/g,"\\'");}
 
@@ -1474,9 +1473,9 @@ document.getElementById('confirm-modal').addEventListener('click',e=>{
   if(e.target===document.getElementById('confirm-modal'))closeModal();
 });
 
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 //  BOOT
-// ââââââââââââââââââââââââââââââââââââââââââ
+// ------------------------------------------------------------------------------------
 window.addEventListener('load', async()=>{
   await loadPins();
   const saved = sessionStorage.getItem('role');
