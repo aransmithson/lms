@@ -655,26 +655,6 @@
   .completion-text .big { font-family: 'DM Serif Display', serif; font-size: 1rem; }
   .completion-text .small { font-size: 0.78rem; color: var(--sage); margin-top: 0.1rem; }
 
-  /* ââ FAB ââ */
-  .fab {
-    position: fixed;
-    bottom: 1.5rem; right: 1.5rem;
-    background: var(--sage);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 52px; height: 52px;
-    font-size: 1.4rem;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    z-index: 50;
-  }
-  .fab:hover { transform: scale(1.06); background: var(--ink); }
-
   /* ââ TOAST ââ */
   .toast {
     position: fixed;
@@ -738,8 +718,6 @@
     .add-item-row { flex-wrap: wrap; }
     .ai-field-aisle { width: 100%; }
     .ai-field-qty { width: 70px; }
-    .fab { display: flex; }
-    .btn-add-item.desktop-only { display: none; }
   }
 </style>
 </head>
@@ -882,13 +860,12 @@
             <option value="Other">Other</option>
           </select>
         </div>
-        <button class="btn-add-item desktop-only" onclick="addItem()">+ Add</button>
+        <button class="btn-add-item" onclick="addItem()">+ Add</button>
       </div>
       <div class="suggestions-box" id="suggestions-box"></div>
     </div>
     <div id="items-section"></div>
   </div>
-  <button class="fab" onclick="document.getElementById('item-input').focus()">+</button>
 </div>
 
 <!-- ââââââââââââââ CONFIRM MODAL ââââââââââââââ -->
