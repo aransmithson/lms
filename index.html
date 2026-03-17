@@ -716,9 +716,8 @@
     .tab-bar { padding: 0 1rem; }
     .tab { padding: 0.7rem 0.8rem; font-size: 0.72rem; }
     .add-item-row { flex-wrap: wrap; }
-    .ai-field-aisle { width: 100%; }
+    .ai-field-aisle { flex: 1; width: auto; }
     .ai-field-qty { width: 70px; }
-    .btn-add-item { width: 100%; justify-content: center; }
     }
 </style>
 </head>
@@ -1174,6 +1173,12 @@ function openList(id) {
   state.currentListId = id;
   showScreen('list-view-screen');
   renderListView();
+  // Restore last-used aisle
+  const lastAisle = localStorage.getItem('smithsons_last_aisle');
+  if (lastAisle) {
+    const sel = document.getElementById('aisle-input');
+    for (const opt of sel.options) { if (opt.value === lastAisle) { sel.value = lastAisle; break; } }
+  }
   clearInterval(state.pollTimer);
   state.pollTimer = setInterval(refreshList, 15000);
 }
@@ -1435,6 +1440,7 @@ async function addItem() {
   }
 
   nameIn.value=''; qtyIn.value='1';
+  localStorage.setItem('smithsons_last_aisle', aisle);
   hideSuggestions(); nameIn.focus();
   await saveData(); renderListView();
 }
