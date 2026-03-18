@@ -1,4 +1,4 @@
-// functions/api/image/[listId].js
+// functions/api/images/[listId].js
 // Handles GET (serve), POST (upload), DELETE (remove) for meal plan images
 // Requires R2 binding: IMAGES_BUCKET
 // Requires KV binding: OURSHOP_KV
@@ -6,7 +6,7 @@
 const DATA_KEY = 'shopping_data';
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB limit
 
-// GET /api/image/:listId — serve the image from R2
+// GET /api/images/:listId — serve the image from R2
 export async function onRequestGet({ params, env }) {
   const { listId } = params;
   try {
@@ -25,7 +25,7 @@ export async function onRequestGet({ params, env }) {
   }
 }
 
-// POST /api/image/:listId — upload image to R2, store URL on list in KV
+// POST /api/images/:listId — upload image to R2, store URL on list in KV
 export async function onRequestPost({ params, request, env }) {
   const { listId } = params;
   try {
@@ -46,7 +46,7 @@ export async function onRequestPost({ params, request, env }) {
     });
 
     // Update list in KV with image URL
-    const imageUrl = `/api/image/${listId}`;
+    const imageUrl = `/api/images/${listId}`;
     const raw = await env.OURSHOP_KV.get(DATA_KEY);
     if (raw) {
       const data = JSON.parse(raw);
@@ -63,7 +63,7 @@ export async function onRequestPost({ params, request, env }) {
   }
 }
 
-// DELETE /api/image/:listId — remove image from R2 and clear URL from KV
+// DELETE /api/images/:listId — remove image from R2 and clear URL from KV
 export async function onRequestDelete({ params, env }) {
   const { listId } = params;
   try {
