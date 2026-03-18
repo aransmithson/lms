@@ -1703,7 +1703,7 @@ async function handleMealPlanFile(e) {
 
   try {
     const compressed = await compressImage(file, 1200, 0.75);
-    const res = await fetch(CONFIG.apiBase + '/image/' + list.id, {
+    const res = await fetch(CONFIG.apiBase + '/images/' + list.id, {
       method: 'POST',
       headers: { 'Content-Type': 'image/jpeg' },
       body: compressed,
@@ -1729,7 +1729,7 @@ async function removeMealPlan() {
 
   showConfirm('Remove meal plan?', 'The photo will be permanently deleted.', async () => {
     try {
-      await fetch(CONFIG.apiBase + '/image/' + list.id, { method: 'DELETE' });
+      await fetch(CONFIG.apiBase + '/images/' + list.id, { method: 'DELETE' });
     } catch {}
     delete list.mealPlanUrl;
     delete list.mealPlanUpdatedAt;
