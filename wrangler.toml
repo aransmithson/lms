@@ -1,6 +1,10 @@
 name = "lms"
 pages_build_output_dir = "."
-
+ 
 [[kv_namespaces]]
 binding = "OURSHOP_KV"
 id = "b837292ab9c347a2bc893c764f322ff3"
+ 
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "smithsons-images"

@@ -707,6 +707,157 @@
   .btn-amber { background: var(--amber); color: white; }
   .btn-amber:hover { background: var(--ink); }
 
+  /* ---- MEAL PLAN IMAGE ---- */
+  .meal-plan-section {
+    margin-bottom: 1.25rem;
+  }
+  .meal-plan-upload {
+    background: var(--paper);
+    border: 2px dashed var(--ink-faint);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .meal-plan-upload:hover { border-color: var(--sage); background: var(--sage-light); }
+  .meal-plan-upload-icon { font-size: 1.5rem; margin-bottom: 0.3rem; opacity: 0.5; }
+  .meal-plan-upload-text { font-size: 0.82rem; color: var(--ink-light); }
+  .meal-plan-upload input[type="file"] { display: none; }
+
+  .meal-plan-card {
+    background: var(--paper);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .meal-plan-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .meal-plan-header:hover { background: var(--paper2); }
+  .meal-plan-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .meal-plan-header-left .mp-icon { font-size: 1rem; }
+  .meal-plan-chevron {
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+    transition: transform 0.25s ease;
+  }
+  .meal-plan-card.expanded .meal-plan-chevron { transform: rotate(180deg); }
+  .meal-plan-preview {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .meal-plan-card.expanded .meal-plan-preview { max-height: 600px; }
+  .meal-plan-img {
+    width: 100%;
+    display: block;
+    cursor: zoom-in;
+  }
+  .meal-plan-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .btn-mp-remove {
+    background: none;
+    border: none;
+    color: var(--rose);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .btn-mp-remove:hover { background: var(--rose-light); }
+  .btn-mp-replace {
+    background: none;
+    border: none;
+    color: var(--ink-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .btn-mp-replace:hover { background: var(--paper2); color: var(--ink); }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+  .meal-plan-uploading {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--ink-light);
+    font-size: 0.85rem;
+  }
+  .mp-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--ink-faint);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    animation: mp-spin 0.6s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  @keyframes mp-spin { to { transform: rotate(360deg); } }
+
   /* ---- RESPONSIVE ---- */
   @media (max-width: 520px) {
     .app-content { padding: 1rem; }
@@ -818,6 +969,8 @@
       <div class="list-view-title" id="lv-title">List</div>
       <div class="list-view-meta" id="lv-meta"></div>
     </div>
+    <!-- Meal Plan Image -->
+    <div class="meal-plan-section" id="meal-plan-section"></div>
     <div class="completion-banner" id="completion-banner" style="display:none;">
       <div class="completion-icon">&#127881;</div>
       <div class="completion-text">
@@ -883,6 +1036,15 @@
   <span class="finish-shop-bar-text" id="finish-shop-bar-text"></span>
   <button class="btn btn-amber" onclick="confirmCompleteEarly()">Finish Shop</button>
 </div>
+
+<!-- -------------- LIGHTBOX -------------- -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&#10005;</button>
+  <img id="lightbox-img" src="" alt="Meal Plan">
+</div>
+
+<!-- Hidden file input for meal plan upload -->
+<input type="file" id="meal-plan-file" accept="image/*" style="display:none" onchange="handleMealPlanFile(event)">
 
 <div class="toast" id="toast"></div>
 
@@ -1244,6 +1406,8 @@ function renderListView() {
 
   document.getElementById('add-item-box').style.display = (state.role==='editor'&&!list.archived)?'':'none';
 
+  renderMealPlan(list);
+
   const section = document.getElementById('items-section');
   if (!total) {
     section.innerHTML = `<div class="empty-state">
@@ -1456,6 +1620,154 @@ async function addItem() {
 }
 
 // ------------------------------------------------------------------------------------
+//  MEAL PLAN IMAGE
+// ------------------------------------------------------------------------------------
+function renderMealPlan(list) {
+  const section = document.getElementById('meal-plan-section');
+  const isEditor = state.role === 'editor';
+  const archived = list.archived;
+
+  // No image and not editor: hide section
+  if (!list.mealPlanUrl && (!isEditor || archived)) {
+    section.innerHTML = '';
+    return;
+  }
+
+  // No image, editor can upload
+  if (!list.mealPlanUrl && isEditor && !archived) {
+    section.innerHTML = `
+      <div class="meal-plan-upload" onclick="document.getElementById('meal-plan-file').click()">
+        <div class="meal-plan-upload-icon">&#128247;</div>
+        <div class="meal-plan-upload-text">Tap to add meal plan photo</div>
+      </div>`;
+    return;
+  }
+
+  // Has image: show collapsible card
+  const expanded = section.querySelector('.meal-plan-card.expanded') ? true : false;
+  const actions = (isEditor && !archived) ? `
+    <div class="meal-plan-actions">
+      <button class="btn-mp-replace" onclick="document.getElementById('meal-plan-file').click()">Replace</button>
+      <button class="btn-mp-remove" onclick="removeMealPlan()">Remove</button>
+    </div>` : '';
+
+  // Cache bust with timestamp to avoid stale images
+  const imgSrc = list.mealPlanUrl + '?t=' + (list.mealPlanUpdatedAt || '');
+
+  section.innerHTML = `
+    <div class="meal-plan-card${expanded ? ' expanded' : ''}" id="meal-plan-card">
+      <div class="meal-plan-header" onclick="toggleMealPlan()">
+        <div class="meal-plan-header-left">
+          <span class="mp-icon">&#127860;</span>
+          <span>Meal Plan</span>
+        </div>
+        <span class="meal-plan-chevron">&#9660;</span>
+      </div>
+      <div class="meal-plan-preview">
+        <img class="meal-plan-img" src="${imgSrc}" alt="Meal Plan" onclick="event.stopPropagation();openLightbox('${imgSrc}')">
+        ${actions}
+      </div>
+    </div>`;
+}
+
+function toggleMealPlan() {
+  const card = document.getElementById('meal-plan-card');
+  if (card) card.classList.toggle('expanded');
+}
+
+function openLightbox(src) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightbox-img').src = src;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function handleMealPlanFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = ''; // reset so same file can be re-selected
+
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list) return;
+
+  // Show uploading state
+  const section = document.getElementById('meal-plan-section');
+  section.innerHTML = `<div class="meal-plan-card">
+    <div class="meal-plan-uploading"><span class="mp-spinner"></span> Compressing &amp; uploading&hellip;</div>
+  </div>`;
+
+  try {
+    const compressed = await compressImage(file, 1200, 0.75);
+    const res = await fetch(CONFIG.apiBase + '/image/' + list.id, {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/jpeg' },
+      body: compressed,
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const result = await res.json();
+
+    list.mealPlanUrl = result.url;
+    list.mealPlanUpdatedAt = Date.now();
+    await saveData();
+    renderListView();
+    toast('Meal plan photo added');
+  } catch (err) {
+    console.error('Image upload error:', err);
+    toast('Upload failed, please try again');
+    renderListView();
+  }
+}
+
+async function removeMealPlan() {
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list) return;
+
+  showConfirm('Remove meal plan?', 'The photo will be permanently deleted.', async () => {
+    try {
+      await fetch(CONFIG.apiBase + '/image/' + list.id, { method: 'DELETE' });
+    } catch {}
+    delete list.mealPlanUrl;
+    delete list.mealPlanUpdatedAt;
+    await saveData();
+    renderListView();
+    toast('Meal plan photo removed');
+  });
+}
+
+function compressImage(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        const ratio = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(
+        blob => blob ? resolve(blob) : reject(new Error('Compression failed')),
+        'image/jpeg',
+        quality
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Failed to load image')); };
+    img.src = url;
+  });
+}
+
+// ------------------------------------------------------------------------------------
 //  MODAL
 // ------------------------------------------------------------------------------------
 function showConfirm(title, body, onOk) {
@@ -1488,6 +1800,9 @@ document.addEventListener('click',e=>{
 });
 document.getElementById('confirm-modal').addEventListener('click',e=>{
   if(e.target===document.getElementById('confirm-modal'))closeModal();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && document.getElementById('lightbox').classList.contains('open')) closeLightbox();
 });
 
 // ------------------------------------------------------------------------------------
