@@ -858,6 +858,38 @@
   }
   @keyframes mp-spin { to { transform: rotate(360deg); } }
 
+  /* ---- OFFLINE SYNC INDICATOR ---- */
+  .sync-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--amber);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 0.4rem 1rem;
+    z-index: 150;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .sync-bar.visible { transform: translateY(0); }
+  .sync-bar.syncing { background: var(--sage); }
+  .sync-bar.error { background: var(--rose); }
+  .sync-spinner {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: mp-spin 0.6s linear infinite;
+    flex-shrink: 0;
+  }
+
   /* ---- RESPONSIVE ---- */
   @media (max-width: 520px) {
     .app-content { padding: 1rem; }
@@ -1046,6 +1078,7 @@
 <!-- Hidden file input for meal plan upload -->
 <input type="file" id="meal-plan-file" accept="image/*" style="display:none" onchange="handleMealPlanFile(event)">
 
+<div class="sync-bar" id="sync-bar"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1071,7 +1104,56 @@ let state = {
   currentListId: null,
   currentTab: 'active',
   pollTimer: null,
+  // Tracks shopper check-toggles not yet synced to server
+  pendingShopperChanges: false,
+  syncRetryTimer: null,
 };
+
+// ------------------------------------------------------------------------------------
+//  OFFLINE SYNC BAR
+// ------------------------------------------------------------------------------------
+function showSyncBar(msg, mode) {
+  const bar = document.getElementById('sync-bar');
+  bar.className = 'sync-bar visible' + (mode ? ' ' + mode : '');
+  bar.innerHTML = mode === 'syncing'
+    ? `<span class="sync-spinner"></span> ${msg}`
+    : `⚠️ ${msg}`;
+}
+function hideSyncBar() {
+  const bar = document.getElementById('sync-bar');
+  bar.className = 'sync-bar';
+}
+
+// Persist locally only (no server call) — used for shopper check-toggling
+function persistAndMark() {
+  persistLocal();
+  state.pendingShopperChanges = true;
+  showSyncBar('Changes saved locally — will sync when you finish the shop');
+}
+
+// Push everything to the server, with retry
+async function syncToServer(retryCount = 0) {
+  if (!state.pendingShopperChanges) return true;
+  showSyncBar('Syncing…', 'syncing');
+  try {
+    const res = await fetch(CONFIG.apiBase + '/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lists: state.lists, knownItems: state.knownItems }),
+    });
+    if (!res.ok) throw new Error('Server error ' + res.status);
+    state.pendingShopperChanges = false;
+    clearTimeout(state.syncRetryTimer);
+    hideSyncBar();
+    return true;
+  } catch (err) {
+    const delay = Math.min(5000 * Math.pow(2, retryCount), 60000);
+    const secs = Math.round(delay / 1000);
+    showSyncBar(`No signal — retrying in ${secs}s. Your ticks are saved locally.`, 'error');
+    state.syncRetryTimer = setTimeout(() => syncToServer(retryCount + 1), delay);
+    return false;
+  }
+}
 
 // ------------------------------------------------------------------------------------
 //  DARK MODE
@@ -1193,10 +1275,24 @@ function showScreen(id) {
 }
 
 function goBack() {
+  if (state.role === 'shopper' && state.pendingShopperChanges) {
+    showConfirm(
+      'Leave without finishing?',
+      'You have unchecked items that haven\'t been synced yet. Your ticks are saved on this device, but go back and tap "Finish Shop" to save them to the shared list.',
+      () => _doGoBack()
+    );
+    return;
+  }
+  _doGoBack();
+}
+
+function _doGoBack() {
   clearInterval(state.pollTimer);
+  clearTimeout(state.syncRetryTimer);
   state.currentListId = null;
   const fb = document.getElementById('finish-shop-bar');
   if (fb) fb.style.display = 'none';
+  hideSyncBar();
   showScreen('app-screen');
   renderLists();
 }
@@ -1344,6 +1440,8 @@ function openList(id) {
 }
 
 async function refreshList() {
+  // Don't overwrite unsync'd shopper ticks with server data
+  if (state.role === 'shopper' && state.pendingShopperChanges) return;
   try {
     const res = await fetch(CONFIG.apiBase+'/data');
     if (res.ok) {
@@ -1395,9 +1493,11 @@ function renderListView() {
   const finishBar = document.getElementById('finish-shop-bar');
   const pending   = list.items.filter(i=>!i.checked && !i.skipped);
   if (finishBar) {
-    if (state.role==='shopper' && !list.archived && !list.shopDone && total>0 && pending.length>0) {
-      document.getElementById('finish-shop-bar-text').innerHTML =
-        `<strong>${pending.length}</strong> item${pending.length!==1?'s':''} still to collect`;
+    if (state.role==='shopper' && !list.archived && !list.shopDone && total>0) {
+      const allDone = pending.length === 0;
+      document.getElementById('finish-shop-bar-text').innerHTML = allDone
+        ? `<strong>All items ticked!</strong> Tap to finish &amp; sync`
+        : `<strong>${pending.length}</strong> item${pending.length!==1?'s':''} still to collect`;
       finishBar.style.display = '';
     } else {
       finishBar.style.display = 'none';
@@ -1500,26 +1600,45 @@ async function toggleItem(itemId) {
   const list=state.lists.find(l=>l.id===state.currentListId); if(!list)return;
   const item=list.items.find(i=>i.id===itemId); if(!item||item.skipped)return;
   item.checked=!item.checked;
-  await saveData(); renderListView();
+  // Shopper: local-only until Finish Shop — works with no signal
+  if (state.role === 'shopper') {
+    persistAndMark();
+    renderListView();
+  } else {
+    await saveData(); renderListView();
+  }
 }
 
 function confirmCompleteEarly() {
   const list = state.lists.find(l=>l.id===state.currentListId);
   if (!list) return;
   const remaining = list.items.filter(i=>!i.checked && !i.skipped);
-  if (!remaining.length) return;
+  if (!remaining.length) {
+    // All items checked — just finish and sync
+    finishShop(list, []);
+    return;
+  }
   showConfirm(
     'Finish shop early?',
     `${remaining.length} item${remaining.length!==1?' items are':' is'} still uncollected. They'll be flagged with a warning so the editor can review what was missed.`,
-    async () => {
-      remaining.forEach(i => { i.skipped = true; });
-      list.shopDone = true;
-      list.shopDoneAt = new Date().toISOString();
-      await saveData();
-      renderListView();
-      toast(`Shop done &mdash; ${remaining.length} item${remaining.length!==1?'s':''} flagged`);
-    }
+    () => finishShop(list, remaining)
   );
+}
+
+async function finishShop(list, uncollected) {
+  uncollected.forEach(i => { i.skipped = true; });
+  list.shopDone = true;
+  list.shopDoneAt = new Date().toISOString();
+  state.pendingShopperChanges = true; // ensure sync happens even if no ticks were pending
+  persistLocal();
+  renderListView();
+  const flagMsg = uncollected.length
+    ? `Shop done &mdash; ${uncollected.length} item${uncollected.length!==1?'s':''} flagged`
+    : 'Shop complete &mdash; syncing…';
+  toast(flagMsg);
+  // Now push everything to the server
+  const ok = await syncToServer();
+  if (ok) toast('All done &mdash; synced to server ✓');
 }
 async function removeItem(itemId) {
   const list=state.lists.find(l=>l.id===state.currentListId); if(!list)return;
