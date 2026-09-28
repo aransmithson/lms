@@ -1131,17 +1131,35 @@ function persistAndMark() {
   showSyncBar('Changes saved locally — will sync when you finish the shop');
 }
 
-// Push everything to the server, with retry
+// Push list updates to the server atomically, with retry
 async function syncToServer(retryCount = 0) {
   if (!state.pendingShopperChanges) return true;
   showSyncBar('Syncing…', 'syncing');
+  const currentList = state.lists.find(l => l.id === state.currentListId);
   try {
-    const res = await fetch(CONFIG.apiBase + '/data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lists: state.lists, knownItems: state.knownItems }),
-    });
+    let res;
+    if (currentList) {
+      res = await fetch(CONFIG.apiBase + '/lists/' + currentList.id, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ list: currentList, role: 'shopper' }),
+      });
+    } else {
+      res = await fetch(CONFIG.apiBase + '/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lists: state.lists, knownItems: state.knownItems }),
+      });
+    }
     if (!res.ok) throw new Error('Server error ' + res.status);
+    if (currentList) {
+      const data = await res.json();
+      if (data.list) {
+        const idx = state.lists.findIndex(l => l.id === currentList.id);
+        if (idx >= 0) state.lists[idx] = data.list;
+        persistLocal();
+      }
+    }
     state.pendingShopperChanges = false;
     clearTimeout(state.syncRetryTimer);
     hideSyncBar();
@@ -1294,37 +1312,87 @@ function _doGoBack() {
   if (fb) fb.style.display = 'none';
   hideSyncBar();
   showScreen('app-screen');
-  renderLists();
+  loadData();
 }
 
 // ------------------------------------------------------------------------------------
-//  DATA
+//  DATA & ATOMIC STORAGE
 // ------------------------------------------------------------------------------------
 async function loadData() {
   try {
-    const res = await fetch(CONFIG.apiBase + '/data');
-    if (res.ok) {
-      const r = await res.json();
-      state.lists = r.lists || [];
-      state.knownItems = r.knownItems || [];
-      persistLocal();
-    } else throw new Error();
+    const [listsRes, itemsRes] = await Promise.all([
+      fetch(CONFIG.apiBase + '/lists'),
+      fetch(CONFIG.apiBase + '/items')
+    ]);
+    if (listsRes.ok) {
+      const listsData = await listsRes.json();
+      state.lists = listsData.lists || [];
+    }
+    if (itemsRes && itemsRes.ok) {
+      const itemsData = await itemsRes.json();
+      state.knownItems = itemsData.items || [];
+    }
+    persistLocal();
   } catch {
-    const local = localStorage.getItem('smithsons_data');
-    if (local) { const d = JSON.parse(local); state.lists = d.lists||[]; state.knownItems = d.knownItems||[]; }
+    // Fallback to legacy endpoint or local cache
+    try {
+      const res = await fetch(CONFIG.apiBase + '/data');
+      if (res.ok) {
+        const r = await res.json();
+        state.lists = r.lists || [];
+        state.knownItems = r.knownItems || [];
+        persistLocal();
+      } else throw new Error();
+    } catch {
+      const local = localStorage.getItem('smithsons_data');
+      if (local) {
+        const d = JSON.parse(local);
+        state.lists = d.lists || [];
+        state.knownItems = d.knownItems || [];
+      }
+    }
   }
   renderLists();
 }
 
-async function saveData() {
+// Save specific list atomically to the server
+async function saveListAtomic(list, role = state.role || 'editor') {
+  if (!list || !list.id) return;
   persistLocal();
   try {
-    await fetch(CONFIG.apiBase + '/data', {
+    const res = await fetch(CONFIG.apiBase + '/lists/' + list.id, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lists: state.lists, knownItems: state.knownItems }),
+      body: JSON.stringify({ list, role })
     });
-  } catch {}
+    if (res.ok) {
+      const data = await res.json();
+      if (data.list) {
+        const idx = state.lists.findIndex(l => l.id === list.id);
+        if (idx >= 0) state.lists[idx] = data.list;
+        persistLocal();
+      }
+    }
+  } catch (err) {
+    console.warn('Network save error, saved locally:', err);
+  }
+}
+
+// Global fallback save
+async function saveData() {
+  persistLocal();
+  const currentList = state.lists.find(l => l.id === state.currentListId);
+  if (currentList) {
+    await saveListAtomic(currentList);
+  } else {
+    try {
+      await fetch(CONFIG.apiBase + '/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lists: state.lists, knownItems: state.knownItems }),
+      });
+    } catch {}
+  }
 }
 
 function persistLocal() {
@@ -1362,8 +1430,8 @@ function renderListGrid(id, lists, isArchived) {
     </div>`; return;
   }
   el.innerHTML = lists.map(list => {
-    const total = list.items.length;
-    const done  = list.items.filter(i=>i.checked).length;
+    const total = Array.isArray(list.items) ? list.items.length : (list.totalItems || 0);
+    const done  = Array.isArray(list.items) ? list.items.filter(i=>i.checked).length : (list.doneItems || 0);
     const pct   = total ? Math.round(done/total*100) : 0;
     const date  = new Date(list.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
     const actions = state.role==='editor' ? `<div class="card-actions">
@@ -1380,7 +1448,7 @@ function renderListGrid(id, lists, isArchived) {
         <span>${total} item${total!==1?'s':''}</span><span>&middot;</span>
         <span>${done} done</span>
         ${(()=>{
-          const sk=list.items.filter(i=>i.skipped).length;
+          const sk = Array.isArray(list.items) ? list.items.filter(i=>i.skipped).length : (list.skippedItems || 0);
           if(sk) return `<span>&middot;</span><span style="color:var(--amber);font-weight:600;">&#9888;&#65039; ${sk} not collected</span>`;
           if(pct===100&&total>0) return `<span>&middot;</span><span style="color:var(--sage);font-weight:600;">&#10003; Complete</span>`;
           return '';
@@ -1400,56 +1468,134 @@ function closeNewListForm() {
   document.getElementById('new-list-form').classList.remove('open');
   document.getElementById('new-list-name').value = '';
 }
+
 async function createList() {
   const name = document.getElementById('new-list-name').value.trim();
   if (!name) return;
+  try {
+    const res = await fetch(CONFIG.apiBase + '/lists', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const newList = data.list;
+      state.lists.unshift(newList);
+      persistLocal();
+      closeNewListForm();
+      openList(newList.id);
+      return;
+    }
+  } catch {}
+  // Local fallback
   const newList = { id:'list_'+Date.now(), name, items:[], archived:false, createdAt:new Date().toISOString() };
   state.lists.unshift(newList);
-  await saveData();
+  persistLocal();
   closeNewListForm();
   openList(newList.id);
 }
+
 async function archiveList(id) {
-  const l=state.lists.find(l=>l.id===id); if(l){l.archived=true;await saveData();renderLists();toast('List archived');}
+  const l = state.lists.find(l => l.id === id);
+  if (!l) return;
+  l.archived = true;
+  persistLocal();
+  renderLists();
+  await saveListAtomic(l, 'editor');
+  toast('List archived');
 }
+
 async function restoreList(id) {
-  const l=state.lists.find(l=>l.id===id); if(l){l.archived=false;await saveData();renderLists();toast('List restored');}
+  const l = state.lists.find(l => l.id === id);
+  if (!l) return;
+  l.archived = false;
+  persistLocal();
+  renderLists();
+  await saveListAtomic(l, 'editor');
+  toast('List restored');
 }
+
 function confirmDeleteList(id) {
-  const l=state.lists.find(l=>l.id===id); if(!l)return;
-  showConfirm(`Delete "${l.name}"?`,'This will permanently remove the list and all its items.', async()=>{
-    state.lists=state.lists.filter(l=>l.id!==id); await saveData(); renderLists(); toast('List deleted');
+  const l = state.lists.find(l => l.id === id);
+  if (!l) return;
+  showConfirm(`Delete "${l.name}"?`,'This will permanently remove the list and all its items.', async () => {
+    state.lists = state.lists.filter(l => l.id !== id);
+    persistLocal();
+    renderLists();
+    try {
+      await fetch(CONFIG.apiBase + '/lists/' + id, { method: 'DELETE' });
+    } catch {}
+    toast('List deleted');
   });
 }
 
 // ------------------------------------------------------------------------------------
 //  LIST VIEW
 // ------------------------------------------------------------------------------------
-function openList(id) {
+async function openList(id) {
   state.currentListId = id;
   showScreen('list-view-screen');
-  renderListView();
+
+  const list = state.lists.find(l => l.id === id);
+  if (list && Array.isArray(list.items)) {
+    renderListView();
+  } else {
+    // Show placeholder loading while details load
+    document.getElementById('lv-title').textContent = list ? list.name : 'Loading…';
+    document.getElementById('items-section').innerHTML = '<div class="empty-state"><div class="empty-desc">Loading list items…</div></div>';
+  }
+
   // Restore last-used aisle
   const lastAisle = localStorage.getItem('smithsons_last_aisle');
   if (lastAisle) {
     const sel = document.getElementById('aisle-input');
     for (const opt of sel.options) { if (opt.value === lastAisle) { sel.value = lastAisle; break; } }
   }
+
+  // Fetch full list from atomic endpoint
+  await fetchCurrentList();
+
   clearInterval(state.pollTimer);
   state.pollTimer = setInterval(refreshList, 15000);
 }
 
+async function fetchCurrentList() {
+  if (!state.currentListId) return;
+  try {
+    const res = await fetch(CONFIG.apiBase + '/lists/' + state.currentListId);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.list) {
+        const idx = state.lists.findIndex(l => l.id === state.currentListId);
+        if (idx >= 0) {
+          state.lists[idx] = data.list;
+        } else {
+          state.lists.push(data.list);
+        }
+        persistLocal();
+        renderListView();
+      }
+    }
+  } catch (err) {
+    console.warn('fetchCurrentList error:', err);
+  }
+}
+
 async function refreshList() {
+  if (!state.currentListId) return;
   // Don't overwrite unsync'd shopper ticks with server data
   if (state.role === 'shopper' && state.pendingShopperChanges) return;
   try {
-    const res = await fetch(CONFIG.apiBase+'/data');
+    const res = await fetch(CONFIG.apiBase + '/lists/' + state.currentListId);
     if (res.ok) {
       const r = await res.json();
-      state.lists = r.lists||[];
-      state.knownItems = r.knownItems||[];
-      persistLocal();
-      if (state.currentListId) renderListView();
+      if (r.list) {
+        const idx = state.lists.findIndex(l => l.id === state.currentListId);
+        if (idx >= 0) state.lists[idx] = r.list;
+        persistLocal();
+        renderListView();
+      }
     }
   } catch {}
 }
@@ -1597,22 +1743,25 @@ function itemRowHtml(item, archived) {
 }
 
 async function toggleItem(itemId) {
-  const list=state.lists.find(l=>l.id===state.currentListId); if(!list)return;
-  const item=list.items.find(i=>i.id===itemId); if(!item||item.skipped)return;
-  item.checked=!item.checked;
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list || !Array.isArray(list.items)) return;
+  const item = list.items.find(i => i.id === itemId);
+  if (!item || item.skipped) return;
+  item.checked = !item.checked;
   // Shopper: local-only until Finish Shop — works with no signal
   if (state.role === 'shopper') {
     persistAndMark();
     renderListView();
   } else {
-    await saveData(); renderListView();
+    renderListView();
+    await saveListAtomic(list, 'editor');
   }
 }
 
 function confirmCompleteEarly() {
-  const list = state.lists.find(l=>l.id===state.currentListId);
-  if (!list) return;
-  const remaining = list.items.filter(i=>!i.checked && !i.skipped);
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list || !Array.isArray(list.items)) return;
+  const remaining = list.items.filter(i => !i.checked && !i.skipped);
   if (!remaining.length) {
     // All items checked — just finish and sync
     finishShop(list, []);
@@ -1636,14 +1785,16 @@ async function finishShop(list, uncollected) {
     ? `Shop done &mdash; ${uncollected.length} item${uncollected.length!==1?'s':''} flagged`
     : 'Shop complete &mdash; syncing…';
   toast(flagMsg);
-  // Now push everything to the server
+  // Now push list to the server atomically
   const ok = await syncToServer();
   if (ok) toast('All done &mdash; synced to server ✓');
 }
 async function removeItem(itemId) {
-  const list=state.lists.find(l=>l.id===state.currentListId); if(!list)return;
-  list.items=list.items.filter(i=>i.id!==itemId);
-  await saveData(); renderListView();
+  const list = state.lists.find(l => l.id === state.currentListId);
+  if (!list || !Array.isArray(list.items)) return;
+  list.items = list.items.filter(i => i.id !== itemId);
+  renderListView();
+  await saveListAtomic(list, 'editor');
 }
 
 // ------------------------------------------------------------------------------------
@@ -1718,24 +1869,34 @@ async function addItem() {
 
   if (!name) { nameIn.focus(); return; }
 
-  const list = state.lists.find(l=>l.id===state.currentListId);
+  const list = state.lists.find(l => l.id === state.currentListId);
   if (!list) return;
 
+  if (!Array.isArray(list.items)) list.items = [];
   list.items.push({ id:'item_'+Date.now(), name, qty, aisle, checked:false, addedAt:new Date().toISOString() });
 
   // Learn / update item
-  const idx = state.knownItems.findIndex(k=>itemName(k).toLowerCase()===name.toLowerCase());
-  if (idx>=0) { state.knownItems[idx]={name,aisle}; }
-  else {
-    state.knownItems.push({name,aisle});
-    state.knownItems.sort((a,b)=>itemName(a).localeCompare(itemName(b)));
-    if (state.knownItems.length>500) state.knownItems.shift();
+  const idx = state.knownItems.findIndex(k => itemName(k).toLowerCase() === name.toLowerCase());
+  if (idx >= 0) {
+    state.knownItems[idx] = { name, aisle };
+  } else {
+    state.knownItems.push({ name, aisle });
+    state.knownItems.sort((a,b) => itemName(a).localeCompare(itemName(b)));
+    if (state.knownItems.length > 500) state.knownItems.shift();
   }
 
-  nameIn.value=''; qtyIn.value='1';
+  // Push learned item to /api/items asynchronously
+  fetch(CONFIG.apiBase + '/items', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ item: { name, aisle } })
+  }).catch(() => {});
+
+  nameIn.value = ''; qtyIn.value = '1';
   localStorage.setItem('smithsons_last_aisle', aisle);
   hideSuggestions(); nameIn.focus();
-  await saveData(); renderListView();
+  renderListView();
+  await saveListAtomic(list, 'editor');
 }
 
 // ------------------------------------------------------------------------------------

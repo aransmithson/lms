@@ -2,8 +2,8 @@
 // Handles GET (serve), POST (upload), DELETE (remove) for meal plan images
 // Requires R2 binding: IMAGES_BUCKET
 // Requires KV binding: OURSHOP_KV
+import { getList, saveList } from '../_db.js';
 
-const DATA_KEY = 'shopping_data';
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB limit
 
 // GET /api/images/:listId — serve the image from R2
@@ -25,7 +25,7 @@ export async function onRequestGet({ params, env }) {
   }
 }
 
-// POST /api/images/:listId — upload image to R2, store URL on list in KV
+// POST /api/images/:listId — upload image to R2, store URL on list in KV atomically
 export async function onRequestPost({ params, request, env }) {
   const { listId } = params;
   try {
@@ -45,16 +45,13 @@ export async function onRequestPost({ params, request, env }) {
       httpMetadata: { contentType: 'image/jpeg' },
     });
 
-    // Update list in KV with image URL
+    // Update list in KV with image URL atomically
     const imageUrl = `/api/images/${listId}`;
-    const raw = await env.OURSHOP_KV.get(DATA_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      const list = (data.lists || []).find(l => l.id === listId);
-      if (list) {
-        list.mealPlanUrl = imageUrl;
-        await env.OURSHOP_KV.put(DATA_KEY, JSON.stringify(data));
-      }
+    const list = await getList(env, listId);
+    if (list) {
+      list.mealPlanUrl = imageUrl;
+      list.mealPlanUpdatedAt = Date.now();
+      await saveList(env, list, { role: 'editor' });
     }
 
     return Response.json({ ok: true, url: imageUrl });
@@ -63,22 +60,19 @@ export async function onRequestPost({ params, request, env }) {
   }
 }
 
-// DELETE /api/images/:listId — remove image from R2 and clear URL from KV
+// DELETE /api/images/:listId — remove image from R2 and clear URL from KV atomically
 export async function onRequestDelete({ params, env }) {
   const { listId } = params;
   try {
     // Remove from R2
     await env.IMAGES_BUCKET.delete(`meal-plan/${listId}.jpg`);
 
-    // Clear URL from list in KV
-    const raw = await env.OURSHOP_KV.get(DATA_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      const list = (data.lists || []).find(l => l.id === listId);
-      if (list) {
-        delete list.mealPlanUrl;
-        await env.OURSHOP_KV.put(DATA_KEY, JSON.stringify(data));
-      }
+    // Clear URL from list in KV atomically
+    const list = await getList(env, listId);
+    if (list) {
+      delete list.mealPlanUrl;
+      delete list.mealPlanUpdatedAt;
+      await saveList(env, list, { role: 'editor' });
     }
 
     return Response.json({ ok: true });
